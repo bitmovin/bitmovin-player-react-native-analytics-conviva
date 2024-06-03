@@ -1,0 +1,117 @@
+name: Finish Release Train
+
+run-name: Finish release train on ${{ github.ref_name }}
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+env:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+
+concurrency:
+  group: finish-release-train-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/v')
+    runs-on: ubuntu-latest
+    outputs:
+      version_number: ${{ steps.version_number.outputs.version_number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
+
+      - name: Setup Git User
+        run: |
+          # setup git
+          git config --global user.name "Bitmovin Release Automation"
+          git config --global user.email "support@bitmovin.com"
+
+      - name: Detect version number
+        id: version_number
+        run: |
+          version_number="$(jq --raw-output '.version' package.json)"
+          echo "Detected version number: $version_number"
+          echo "version_number=$version_number" >> $GITHUB_OUTPUT
+
+      - name: Update Changelog
+        run: |
+          sed -i "s/\[${{ steps.version_number.outputs.version_number }}\].*/\[${{ steps.version_number.outputs.version_number }}\] \($(date +'%Y-%m-%d')\)/g" CHANGELOG.md
+
+      - name: Commit changelog version bump
+        run: |
+          git add CHANGELOG.md
+          git commit -m "chore: bump changelog date to today"
+          git push origin ${{ github.ref }}
+
+  create_pr:
+    needs: [prepare]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create PR
+        run: |
+          gh pr create \
+          --base "development" \
+          --head "main" \
+          --title "Finish release ${{ needs.prepare.outputs.version_number }}" \
+          --body "Finish release ${{ needs.prepare.outputs.version_number }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  publish_release:
+    needs: [prepare, create_pr]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Git User
+        run: |
+          # setup git
+          git config --global user.name "Bitmovin Release Automation"
+          git config --global user.email "support@bitmovin.com"
+
+      - name: Add tag
+        run: |
+          git tag v${{ needs.prepare.outputs.version_number }}
+
+      - name: Git push
+        run: |
+          git push origin v${{ needs.prepare.outputs.version_number }}
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node: true
+
+      - name: Build TypeScript files
+        run: yarn build
+
+      - name: Publish npm package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Extract changelog
+        id: changelog
+        uses: ffurrer2/extract-release-notes@v1
+
+      - name: Create GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ needs.prepare.outputs.version_number }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: ${{ steps.changelog.outputs.release_notes }}
