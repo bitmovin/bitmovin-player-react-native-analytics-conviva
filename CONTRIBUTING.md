@@ -1,56 +1,97 @@
 # Contributing
 
-Contributions are always welcome, no matter how large or small!
+## Issues
 
-We want this community to be friendly and respectful to each other. Please follow it in all your interactions with the project. Before contributing, please read the [code of conduct](./CODE_OF_CONDUCT.md).
+With bugs and problems, please try to describe the issue as detailed as possible to help us reproduce it.
+
+## Pull Request Process
+
+Pull requests are welcome and pair well with bug reports and feature requests. Here are some tips to follow before submitting your first PR:
+
+- Fork the repository to your own account if you haven't already.
+- Develop in a fix or feature branch (`fix/describe-your-fix`, `feature/describe-your-feature`), not in `main` or `develop`.
+- Please do not introduce new project warnings and adhere to swiftlint styling
+- Make your changes in your fork.
+- Run tests locally via Xcode.
+- Validate your changes with the Convia Touchstone backend.
+- Add an entry to the [CHANGELOG.md](CHANGELOG.md) file in the `[Unreleased]` section to describe the changes to the project.
+- Submit a pull request to the main repository.
+
+The versioning scheme we use is [SemVer](http://semver.org/).
+
+All additions, modifications and fixes that are submitted will be reviewed. The project owners reserve the right to reject any pull request that does not meet our standards. We may not be able to respond to all pull requests immediately and provide no timeframes to do so.
+
+# Contributing
+
+Thanks for contributing to this project. Your time and input are appreciated. To get the most out of the project, please consider the following.
+
+## Code of Conduct
+
+Please note we have a [Code of Conduct](CODE_OF_CONDUCT.md), please follow it in all your interactions with the project.
 
 ## Development workflow
 
-This project is a monorepo managed using [Yarn workspaces](https://yarnpkg.com/features/workspaces). It contains the following packages:
-
-- The library package in the root directory.
-- An example app in the `example/` directory.
-
-To get started with the project, run `yarn` in the root directory to install the required dependencies for each package:
+To get started with the project, run `yarn bootstrap` in the root directory to install the required dependencies for each package and cocoapods dependencies for the example app:
 
 ```sh
-yarn
+yarn bootstrap
 ```
 
-> Since the project relies on Yarn workspaces, you cannot use [`npm`](https://github.com/npm/cli) for development.
+> While it's possible to use [`npm`](https://github.com/npm/cli), the tooling is built around [`yarn`](https://classic.yarnpkg.com/), so you'll have an easier time if you use `yarn` for development.
 
-The [example app](/example/) demonstrates usage of the library. You need to run it to test any changes you make.
+While developing, you can run the [example app](/example/) to test your changes. Any changes you make in your library's JavaScript code will be reflected in the example app without a rebuild. If you change any native code, then you'll need to rebuild the example app.
 
-It is configured to use the local version of the library, so any changes you make to the library's source code will be reflected in the example app. Changes to the library's JavaScript code will be reflected in the example app without a rebuild, but native code changes will require a rebuild of the example app.
-
-If you want to use Android Studio or XCode to edit the native code, you can open the `example/android` or `example/ios` directories respectively in those editors. To edit the Objective-C or Swift files, open `example/ios/BitmovinPlayerReactNativeAnalyticsConvivaExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > bitmovin-player-react-native-analytics-conviva`.
-
-To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `bitmovin-player-react-native-analytics-conviva` under `Android`.
-
-You can use various commands from the root directory to work with the project.
-
-To start the packager:
+To start the packager, run in the root directory:
 
 ```sh
 yarn example start
 ```
 
-To run the example app on Android:
+To build and run the example app on Android:
 
 ```sh
 yarn example android
 ```
 
-To run the example app on iOS:
+To build and run the example app on iOS:
 
 ```sh
 yarn example ios
 ```
 
+To edit the Swift/Objective-C files, open `example/ios/BitmovinPlayerReactNativeAnalyticsConvivaExample.xcworkspace` in Xcode and find the source files at `Pods > Development Pods > RNBitmovinPlayer`.
+
+To edit the Kotlin files, open `example/android` in Android Studio and find the source files at `bitmovin-player-react-native` under `Android`.
+
+## For iOS/tvOS on-device development
+
+To build the example project for an iOS or tvOS device, you need to create a file at `example/ios/Developer.xcconfig`. In this file, add your development team like this:
+
+```yml
+DEVELOPMENT_TEAM = YOUR_TEAM_ID
+```
+
+## TypeScript Code Style
+
+- Follow the `eslint` rules (`yarn lint`). They are enforced automatically via a pre-commit git hook.
+- Always add return values to functions (even if `void`)
+- No unused imports
+- Public functions should be documented with a description that explains _what_ it does
+- Every code block that does not obviously explain itself should be commented with an explanation of _why_ and _what_ it does
+
+## Linting
+
+### Typescript
+
+[ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [TypeScript](https://www.typescriptlang.org/)
+
+We use [TypeScript](https://www.typescriptlang.org/) for type checking, [ESLint](https://eslint.org/) with [Prettier](https://prettier.io/) for linting and formatting the code, and [Jest](https://jestjs.io/) for testing.
+
+Our pre-commit hooks verify that the linter will pass when committing.
 Make sure your code passes TypeScript and ESLint. Run the following to verify:
 
 ```sh
-yarn typecheck
+yarn typescript
 yarn lint
 ```
 
@@ -60,63 +101,62 @@ To fix formatting errors, run the following:
 yarn lint --fix
 ```
 
-Remember to add tests for your change if possible. Run the unit tests by:
+### Kotlin
+
+For Kotlin code [ktlint](https://pinterest.github.io/ktlint/) is used with [ktlint gradle plugin](https://github.com/jlleitschuh/ktlint-gradle).
+Run the following inside `android` folder to verify code format:
 
 ```sh
-yarn test
+./gradlew ktlintCheck
 ```
 
-### Commit message convention
-
-We follow the [conventional commits specification](https://www.conventionalcommits.org/en) for our commit messages:
-
-- `fix`: bug fixes, e.g. fix crash due to deprecated method.
-- `feat`: new features, e.g. add new method to the module.
-- `refactor`: code refactor, e.g. migrate from class components to hooks.
-- `docs`: changes into documentation, e.g. add usage example for the module..
-- `test`: adding or updating tests, e.g. add integration tests using detox.
-- `chore`: tooling changes, e.g. change CI config.
-
-Our pre-commit hooks verify that your commit message matches this format when committing.
-
-### Linting and tests
-
-[ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [TypeScript](https://www.typescriptlang.org/)
-
-We use [TypeScript](https://www.typescriptlang.org/) for type checking, [ESLint](https://eslint.org/) with [Prettier](https://prettier.io/) for linting and formatting the code, and [Jest](https://jestjs.io/) for testing.
-
-Our pre-commit hooks verify that the linter and tests pass when committing.
-
-### Publishing to npm
-
-We use [release-it](https://github.com/release-it/release-it) to make it easier to publish new versions. It handles common tasks like bumping version based on semver, creating tags and releases etc.
-
-To publish new versions, run the following:
+To fix formatting errors, run the following inside `android` folder:
 
 ```sh
-yarn release
+./gradlew ktlintFormat
 ```
 
-### Scripts
+You can add a lint check pre-commit hook by running inside `android` folder:
+
+```sh
+./gradlew addKtlintCheckGitPreCommitHook
+```
+
+and for automatic pre-commit formatting:
+
+```sh
+./gradlew addKtlintFormatGitPreCommitHook
+```
+
+### Swift
+
+For Swift code [SwiftLint](https://github.com/realm/SwiftLint) is used.
+To install SwiftLint, run `brew bundle install` in the root directory.
+Our pre-commit hooks verify that the linter will pass when committing.
+
+To verify Swift code, run the following:
+
+```sh
+swiftlint
+```
+
+To fix auto-fixable SwiftLint violations, run the following:
+
+```sh
+swiftlint lint --autocorrect
+```
+
+## Scripts
 
 The `package.json` file contains various scripts for common tasks:
 
-- `yarn`: setup project by installing dependencies.
-- `yarn typecheck`: type-check files with TypeScript.
+- `yarn bootstrap`: setup the whole project by installing all dependencies and pods.
+- `yarn bootstrap:example`: setup example project by installing all dependencies and pods.
+- `yarn build`: compile TypeScript files into `lib/` with ESBuild.
+- `yarn typescript`: type-check files with TypeScript.
 - `yarn lint`: lint files with ESLint.
-- `yarn test`: run unit tests with Jest.
+- `yarn format`: format files with Prettier.
+- `yarn brew`: install all dependencies for iOS development with Homebrew.
 - `yarn example start`: start the Metro server for the example app.
 - `yarn example android`: run the example app on Android.
-- `yarn example ios`: run the example app on iOS.
-
-### Sending a pull request
-
-> **Working on your first pull request?** You can learn how from this _free_ series: [How to Contribute to an Open Source Project on GitHub](https://app.egghead.io/playlists/how-to-contribute-to-an-open-source-project-on-github).
-
-When you're sending a pull request:
-
-- Prefer small pull requests focused on one change.
-- Verify that linters and tests are passing.
-- Review the documentation to make sure it looks good.
-- Follow the pull request template when opening a pull request.
-- For pull requests that change the API or implementation, discuss with maintainers first by opening an issue.
+- `yarn example pods`: install pods only.

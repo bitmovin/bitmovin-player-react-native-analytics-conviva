@@ -1,8 +1,7 @@
 @objc(BitmovinPlayerReactNativeAnalyticsConviva)
-class BitmovinPlayerReactNativeAnalyticsConviva: NSObject {
-
-  @objc(multiply:withB:withResolver:withRejecter:)
-  func multiply(a: Float, b: Float, resolve:RCTPromiseResolveBlock,reject:RCTPromiseRejectBlock) -> Void {
-    resolve(a*b)
+public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject { // swiftlint:disable:this type_name
+  @objc(message:resolver:rejecter:)
+  func message(prefix: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+    resolve("\(prefix) on iOS/tvOS!")
   }
 }

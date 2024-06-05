@@ -74,9 +74,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.bitmovinplayerreactnativeanalyticsconvivaexample"
+    namespace "com.bitmovin.player.reactnative.analytics.conviva.example"
     defaultConfig {
-        applicationId "com.bitmovinplayerreactnativeanalyticsconvivaexample"
+        applicationId "com.bitmovin.player.reactnative.analytics.conviva.example"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

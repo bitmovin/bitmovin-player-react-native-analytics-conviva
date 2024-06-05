@@ -1,19 +1,36 @@
-import * as React from 'react';
-
-import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'bitmovin-player-react-native-analytics-conviva';
+import React, { useEffect } from 'react';
+import { StyleSheet, SafeAreaView } from 'react-native';
+import {
+  usePlayer,
+  PlayerView,
+  SourceType,
+} from 'bitmovin-player-react-native';
+import { useTVGestures } from '../hooks';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
+  useTVGestures();
 
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
-  }, []);
+  const player = usePlayer({
+    playbackConfig: {
+      isAutoplayEnabled: true,
+    },
+  });
+
+  useEffect(() => {
+    player.load({
+      url: 'https://bitmovin-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+      type: SourceType.HLS,
+      title: 'Art of Motion',
+    });
+    return () => {
+      player.destroy();
+    };
+  }, [player]);
 
   return (
-    <View style={styles.container}>
-      <Text>Result: {result}</Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <PlayerView player={player} style={styles.player} />
+    </SafeAreaView>
   );
 }
 
@@ -21,11 +38,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor: 'white',
+    marginHorizontal: 16,
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  player: {
+    aspectRatio: 16 / 9,
+    backgroundColor: 'black',
   },
 });

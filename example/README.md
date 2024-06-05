@@ -1,79 +1,104 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Example Application
 
-# Getting Started
+This is a React Native application built to showcase the features of `bitmovin-player-react-native-analytics-conviva`. The code for example usage of this library is contained inside the [`example/src/App.tsx`](https://github.com/bitmovin/bitmovin-player-react-native-analytics-conviva/tree/main/example/src/App.tsx) directory:
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Getting started
 
-## Step 1: Start the Metro Server
+To get started with the project, run `yarn bootstrap` in the library's root directory (not `example/`). This will install dependencies for both the library and the example application (as well as native dependencies):
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
-
-To start Metro, run the following command from the _root_ of your React Native project:
-
-```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
+```sh
+cd bitmovin-player-react-native-analytics-conviva # Go to library's root directory
+yarn bootstrap # Install all dependencies
 ```
 
-## Step 2: Start your Application
+## Configuring your license key
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+Before running the application, make sure to set up your Bitmovin's license key in the native metadata file of each platform:
 
-### For Android
+**iOS**
 
-```bash
-# using npm
-npm run android
+Edit the license key in `example/ios/BitmovinPlayerReactNativeAnalyticsConvivaExample/Info.plist`:
 
-# OR using Yarn
-yarn android
+```xml
+<key>BitmovinPlayerLicenseKey</key>
+<string>ENTER_LICENSE_KEY</string>
 ```
 
-### For iOS
+**tvOS**
 
-```bash
-# using npm
-npm run ios
+Edit the license key in `example/ios/BitmovinPlayerReactNativeAnalyticsConvivaExample-tvOS/Info.plist`:
 
-# OR using Yarn
-yarn ios
+```xml
+<key>BitmovinPlayerLicenseKey</key>
+<string>ENTER_LICENSE_KEY</string>
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+**Android**
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+Edit the license key in `example/android/app/src/main/AndroidManifest.xml`:
 
-## Step 3: Modifying your App
+```xml
+<meta-data android:name="BITMOVIN_PLAYER_LICENSE_KEY" android:value="<ENTER_LICENSE_KEY>" />
+```
 
-Now that you have successfully run the app, let's modify it.
+**Programmatically**
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+Alternatively you can provide your license key programmatically via the config object of `usePlayer`. Providing it this way removes the need for the step above, but keep in mind that at least one of them is necessary to successfully run the examples.
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+```ts
+const player = usePlayer({
+  // Just pass the key in the config object of `usePlayer` or `new Player()` in each example
+  licenseKey: 'Your-License-Key',
+});
+```
 
-## Congratulations! :tada:
+### Add the Package Name and Bundle Identifiers as an Allowed Domain
 
-You've successfully run and modified your React Native App. :partying_face:
+Add the following package names and bundle identifiers of the example applications ending as an allowed domain on [https://bitmovin.com/dashboard](https://bitmovin.com/dashboard), under `Player -> Licenses` and also under `Analytics -> Licenses`.
 
-### Now what?
+#### Android example application Package Name
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+```
+com.bitmovin.player.reactnative.analytics.conviva.example
+```
 
-# Troubleshooting
+#### iOS example application Bundle Identifier
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+```
+com.bitmovin.PlayerReactNativeAnalyticsConvivaExample
+```
 
-# Learn More
+#### tvOS example application Bundle Identifier
 
-To learn more about React Native, take a look at the following resources:
+```
+com.bitmovin.PlayerReactNativeAnalyticsConvivaExample-tvOS
+```
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## Running the application
+
+**Terminal**
+
+```sh
+yarn example ios # Run examples on iOS
+yarn example android # Run examples on Android
+```
+
+Hint: You can provide a specific simulator by name when using `--simulator` flag. `xcrun simctl list devices available` provides you with a list of available devices in your environment.
+
+```sh
+yarn example ios --simulator="iPhone 15 Pro"
+```
+
+**IDE**
+
+You can also open the iOS project using Xcode by typing `xed example/ios` on terminal, or `studio example/android` to open the android project in Android Studio (make sure to setup its binaries first).
+
+### Running the bundler only
+
+The bundler is automatically started when running `yarn example android` or `yarn example ios` or when running via the IDEs, but it can also be started separately.
+
+To start the metro bundler, run the following command on the library's root (always execute `yarn` from the library's root):
+
+```sh
+yarn example start # Starts bundler on the example folder
+```
