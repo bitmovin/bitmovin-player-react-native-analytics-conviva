@@ -2968,6 +2968,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/validator@npm:^13.11.10":
+  version: 13.11.10
+  resolution: "@types/validator@npm:13.11.10"
+  checksum: 0559254715f222664546e29d3e13cb731327f5ef556eb7c149de5a2b58630dc90831eb268a0a83ddb5e67ffddb28e0d43bf480258eef84ee5e3ae919d0c1d87a
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 21.0.3
   resolution: "@types/yargs-parser@npm:21.0.3"
@@ -3663,11 +3670,13 @@ __metadata:
     "@react-native/babel-preset": 0.74.83
     "@react-native/metro-config": 0.74.83
     "@react-native/typescript-config": 0.74.83
+    "@types/validator": ^13.11.10
     babel-plugin-module-resolver: ^5.0.0
     bitmovin-player-react-native: 0.24.0
     pod-install: ^0.1.0
     react: 18.2.0
     react-native: "npm:react-native-tvos@0.74.1-0"
+    validator: ^13.12.0
   languageName: unknown
   linkType: soft
 
@@ -10546,6 +10555,13 @@ __metadata:
     spdx-correct: ^3.0.0
     spdx-expression-parse: ^3.0.0
   checksum: 35703ac889d419cf2aceef63daeadbe4e77227c39ab6287eeb6c1b36a746b364f50ba22e88591f5d017bc54685d8137bc2d328d0a896e4d3fd22093c0f32a9ad
+  languageName: node
+  linkType: hard
+
+"validator@npm:^13.12.0":
+  version: 13.12.0
+  resolution: "validator@npm:13.12.0"
+  checksum: fb8f070724770b1449ea1a968605823fdb112dbd10507b2802f8841cda3e7b5c376c40f18c84e6a7b59de320a06177e471554101a85f1fa8a70bac1a84e48adf
   languageName: node
   linkType: hard
 
