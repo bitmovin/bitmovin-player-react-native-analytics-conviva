@@ -7,6 +7,7 @@ import {
   Button,
   StyleSheet,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import {
   PlayerView,
@@ -101,7 +102,7 @@ export default function App() {
     });
   }, [createPlayer]);
 
-  const destroy = useCallback(() => {
+  const release = useCallback(() => {
     // TODO release conviva analytics
     player.unload();
   }, [player]);
@@ -132,36 +133,42 @@ export default function App() {
     adsEnabledRef.current = adsEnabled;
   }, [adsEnabled]);
 
+  const Container = Platform.isTV ? View : SafeAreaView;
+
   return (
-    <SafeAreaView style={styles.container}>
+    <Container style={styles.container}>
       <PlayerView style={styles.player} player={player} />
-      <View style={styles.adControlContainer}>
-        <Text>Ads enabled</Text>
-        <Switch value={adsEnabled} onValueChange={setAdsEnabled} />
-      </View>
-      <TextInput
-        style={styles.textInput}
-        placeholder="Custom stream url"
-        textContentType="URL"
-        onChangeText={(text) => {
-          assetUrlRef.current = text;
-        }}
-      />
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Setup"
-          onPress={() => {
-            setupPlayer();
-          }}
-        />
-        <Button title="Destroy" onPress={destroy} />
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button title="Pause tracking" onPress={pauseTracking} />
-        <Button title="Resume Tracking" onPress={resumeTracking} />
-      </View>
-      <Button title="Send custom event" onPress={sendCustomEvent} />
-    </SafeAreaView>
+      {!Platform.isTV && (
+        <>
+          <View style={styles.adControlContainer}>
+            <Text>Ads enabled</Text>
+            <Switch value={adsEnabled} onValueChange={setAdsEnabled} />
+          </View>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Custom stream url"
+            textContentType="URL"
+            onChangeText={(text) => {
+              assetUrlRef.current = text;
+            }}
+          />
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Setup"
+              onPress={() => {
+                setupPlayer();
+              }}
+            />
+            <Button title="Release" onPress={release} />
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button title="Pause tracking" onPress={pauseTracking} />
+            <Button title="Resume Tracking" onPress={resumeTracking} />
+          </View>
+          <Button title="Send custom event" onPress={sendCustomEvent} />
+        </>
+      )}
+    </Container>
   );
 }
 
