@@ -95,7 +95,10 @@ export default function App() {
   );
 
   const setupPlayer = useCallback(() => {
-    setPlayer(createPlayer());
+    setPlayer((prevPlayer) => {
+      prevPlayer.destroy();
+      return createPlayer();
+    });
   }, [createPlayer]);
 
   const destroy = useCallback(() => {
