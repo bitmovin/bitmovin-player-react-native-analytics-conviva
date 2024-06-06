@@ -79,6 +79,16 @@ allprojects {
 }
 ```
 
+Add the following permissions to `AndroidManifest.xml`:
+
+```
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+```
+
+For more information about permissions and collected network types please look at the [Conviva Documentation](https://community.conviva.com/site/global/platforms/android/android_sdk/taskref/index.gsp#report_network_metrics).
+
 ### Compatibility
 
 Conviva Analytics Integration depends on `bitmovin-player-react-native` version `>= 0.24.0`.
@@ -92,10 +102,10 @@ The following example shows how to setup the `BitmovinConvivaAnalytics`:
 ```ts
 const player = usePlayer();
 
-const convivaAnalytics = ConvivaAnalytics({
+const convivaAnalytics = ConvivaAnalytics(
   player: player,
   customerKey: 'YOUR-CONVIVA-CUSTOMER-KEY',
-});
+);
 
 const onConvivaSetupError = useCallback((error) => {
   console.error('Conviva error', error);
@@ -118,11 +128,11 @@ Details about usage of `BitmovinPlayer` can be found [here](https://github.com/b
 If you want to override some content metadata attributes you can do so by adding the following:
 
 ```ts
-const metadata = BitmovinConvivaAnalytics.Metadata();
-metadata.applicationName = 'Bitmovin iOS Conviva integration example app';
-metadata.viewerId = 'awesomeViewerId';
-metadata.custom = { contentType: 'Episode' };
-
+const metadata: ConvivaMetadataOverrides = {
+  applicationName: 'Bitmovin iOS Conviva integration example app',
+  viewerId: 'awesomeViewerId',
+  custom: { custom_tag: 'Episode' },
+};
 // …
 // Initialize ConvivaAnalytics
 // …
