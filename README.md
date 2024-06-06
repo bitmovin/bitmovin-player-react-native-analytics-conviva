@@ -168,7 +168,3 @@ If you want to use the same player instance for multiple playback, just load a n
 ```ts
 player.load(…);
 ```
-
-## Limitations
-
-- Tracking multiple sources within a Playlist, and related use cases, introduced in Player iOS SDK version `v3` are not supported.
