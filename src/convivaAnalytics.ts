@@ -3,11 +3,22 @@ import type { ConvivaConfig } from './convivaConfig';
 import type { ConvivaMetadataOverrides } from './convivaMetadataOverrides';
 import type { ConvivaErrorSeverity } from './convivaErrorSeverity';
 
+/**
+ * The ConvivaAnalytics class is used to interact with the Conviva Analytics SDK.
+ * @platform Android, iOS, tvOS
+ */
 export class ConvivaAnalytics {
   player: Player;
   customerKey: string;
   config: ConvivaConfig;
 
+  /**
+   * Creates a new instance of the ConvivaAnalytics.
+   *
+   * @param player The player instance which will be used for tracking.
+   * @param customerKey The customer key which will be used for tracking.
+   * @param config The configuration for the conviva analytics.
+   */
   constructor(
     player: Player,
     customerKey: string,
@@ -20,16 +31,24 @@ export class ConvivaAnalytics {
 
   /**
    * Initializes the conviva analytics.
-   * @returns promise which resolves when the conviva analytics is initialized.
+   * @returns promise which resolves when the conviva analytics is sucessfully initialized.
+   *
+   * @platform Android, iOS, tvOS
    */
   initialize = async (): Promise<void> => {
+    // TODO: Implement initialization
     console.log('ConvivaAnalytics initialized');
     return Promise.resolve();
   };
 
+  /**
+   * Releases the conviva analytics.
+   *
+   * @platform Android, iOS, tvOS
+   */
   release = () => {
+    // TODO: Implement release
     console.log('ConvivaAnalytics released');
-    return Promise.resolve();
   };
 
   /**
@@ -38,17 +57,22 @@ export class ConvivaAnalytics {
    *
    * @warning The integration can only be validated without external session managing.
    * So when using this method we can no longer ensure that the session is managed at the correct time.
+   *
+   * @platform Android, iOS, tvOS
    */
   endSession = () => {
+    // TODO: Implement endSession
     console.log('ConvivaAnalytics session ended');
-    return Promise.resolve();
   };
 
   /**
    * Set the PlayerView to enable view triggered events like fullscreen state changes
    * @param viewRef reference to the PlayerView passed via `<PlayerView viewRef={viewRef}>`
+   *
+   * @platform Android, iOS, tvOS
    */
   setPlayerViewRef = (viewRef: React.MutableRefObject<null>) => {
+    // TODO: Implement setPlayerViewRef
     console.log(`ConvivaAnalytics player view ref set to ${viewRef}`);
   };
 
@@ -67,6 +91,7 @@ export class ConvivaAnalytics {
    * @platform Android, iOS, tvOS
    */
   updateContentMetadata = (metadata: ConvivaMetadataOverrides) => {
+    // TODO: Implement updateContentMetadata
     console.log(
       `ConvivaAnalytics content metadata updated with ${JSON.stringify(metadata)}`
     );
@@ -85,6 +110,7 @@ export class ConvivaAnalytics {
     name: string,
     attributes: { [key: string]: any }
   ) => {
+    // TODO: Implement sendCustomApplicationEvent
     console.log(
       `ConvivaAnalytics custom application event sent with name ${name} and attributes ${JSON.stringify(attributes)}`
     );
@@ -103,6 +129,7 @@ export class ConvivaAnalytics {
     name: string,
     attributes: { [key: string]: any }
   ) => {
+    // TODO: Implement sendCustomPlaybackEvent
     console.log(
       `ConvivaAnalytics custom playback event sent with name ${name} and attributes ${JSON.stringify(attributes)}`
     );
@@ -123,6 +150,7 @@ export class ConvivaAnalytics {
     severity: ConvivaErrorSeverity,
     endSession: boolean = true
   ) => {
+    // TODO: Implement reportPlaybackDeficiency
     console.log(
       `ConvivaAnalytics playback deficiency reported with message ${message}, severity ${severity}, and endSession ${endSession}`
     );
@@ -137,6 +165,7 @@ export class ConvivaAnalytics {
    * @platform Android, iOS, tvOS
    */
   pauseTracking = (isBumper: boolean) => {
+    // TODO: Implement pauseTracking
     console.log(`ConvivaAnalytics tracking paused with bumper: ${isBumper}`);
   };
 
@@ -145,6 +174,7 @@ export class ConvivaAnalytics {
    * @platform Android, iOS, tvOS
    */
   resumeTracking = () => {
+    // TODO: Implement resumeTracking
     console.log('ConvivaAnalytics tracking resumed');
   };
 
@@ -153,6 +183,7 @@ export class ConvivaAnalytics {
    * @platform Android
    */
   reportAppForegrounded = () => {
+    // TODO: Implement reportAppForegrounded
     console.log('ConvivaAnalytics app foregrounded');
   };
 
@@ -161,6 +192,7 @@ export class ConvivaAnalytics {
    * @platform Android
    */
   reportAppBackgrounded = () => {
+    // TODO: Implement reportAppBackgrounded
     console.log('ConvivaAnalytics app backgrounded');
   };
 }
