@@ -1,5 +1,8 @@
 import type { StreamType } from './streamType';
 
+/**
+ * Metadata overrides for Conviva analytics.
+ */
 export interface ConvivaMetadataOverrides {
   // Can only be set once
   assetName?: string;
