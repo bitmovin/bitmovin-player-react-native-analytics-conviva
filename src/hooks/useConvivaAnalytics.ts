@@ -1,12 +1,9 @@
 import { useRef } from 'react';
 import { ConvivaAnalytics } from '../convivaAnalytics';
-import type { Player } from 'bitmovin-player-react-native';
-import type { ConvivaConfig } from '../convivaConfig';
+import type { ConvivaAnalyticsConfig } from '../convivaAnalyticsConfig';
 
 export function useConvivaAnalytics(
-  player: Player,
-  customerKey: string,
-  config: ConvivaConfig | undefined = undefined
+  config: ConvivaAnalyticsConfig
 ): ConvivaAnalytics {
-  return useRef(new ConvivaAnalytics(player, customerKey, config)).current;
+  return useRef(new ConvivaAnalytics(config)).current;
 }

@@ -91,14 +91,12 @@ export default function App() {
   const [player, setPlayer] = useState(createPlayer());
 
   const createConvivaAnalytics = useCallback(async () => {
-    const convivaAnalytics = new ConvivaAnalytics(
-      player,
-      CONVIVA_CUSTOMER_KEY,
-      {
-        debugLoggingEnabled: true,
-        gatewayUrl: CONVIVA_GATEWAY_URL,
-      }
-    );
+    const convivaAnalytics = new ConvivaAnalytics({
+      player: player,
+      customerKey: CONVIVA_CUSTOMER_KEY,
+      debugLoggingEnabled: true,
+      gatewayUrl: CONVIVA_GATEWAY_URL,
+    });
     await convivaAnalytics.initialize();
     convivaAnalytics.updateContentMetadata({
       applicationName: 'Bitmovin iOS Conviva integration example app',
