@@ -25,4 +25,5 @@ export interface ConvivaMetadataOverrides {
   encodedFramerate?: number;
   defaultResource?: string;
   streamUrl?: string;
+  imaSdkVersion?: string;
 }
