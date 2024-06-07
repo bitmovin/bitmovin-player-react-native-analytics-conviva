@@ -1,49 +1,16 @@
-import type { Player } from 'bitmovin-player-react-native';
-import type { ConvivaConfig } from './convivaConfig';
 import type { ConvivaMetadataOverrides } from './convivaMetadataOverrides';
 import type { ConvivaErrorSeverity } from './convivaErrorSeverity';
 import { Platform } from 'react-native';
+import NativeInstance from './nativeInstance';
+import type { ConvivaAnalyticsConfig } from './convivaAnalyticsConfig';
 
 /**
  * The ConvivaAnalytics class is used to interact with the Conviva Analytics SDK.
  * @platform Android, iOS, tvOS
  */
-export class ConvivaAnalytics {
-  /**
-   * The player instance which will be used for tracking.
-   * @platform Android, iOS, tvOS
-   * @readonly
-   */
-  readonly player: Player;
-  /**
-   * The customer key which will be used for tracking.
-   * @platform Android, iOS, tvOS
-   * @readonly
-   */
-  readonly customerKey: string;
-  /**
-   * The configuration for the conviva analytics.
-   * @platform Android, iOS, tvOS
-   * @readonly
-   */
-  readonly config: ConvivaConfig;
-
-  /**
-   * Creates a new instance of the ConvivaAnalytics.
-   *
-   * @param player The player instance which will be used for tracking.
-   * @param customerKey The customer key which will be used for tracking.
-   * @param config The configuration for the conviva analytics.
-   */
-  constructor(
-    player: Player,
-    customerKey: string,
-    config: ConvivaConfig | undefined = undefined
-  ) {
-    this.player = player;
-    this.customerKey = customerKey;
-    this.config = config || { debugLoggingEnabled: false };
-  }
+export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
+  isInitialized = false;
+  isDestroyed = false;
 
   /**
    * Initializes the conviva analytics.
@@ -54,8 +21,22 @@ export class ConvivaAnalytics {
   initialize = async (): Promise<void> => {
     // TODO: Implement initialization
     console.log('ConvivaAnalytics initialized');
+
+    if (this.isInitialized) {
+      return;
+    }
+    this.isInitialized = true;
     return Promise.resolve();
   };
+
+  /**
+   * Destroys the native `ConvivaAnalytics` and releases all of its allocated resources.
+   */
+  destroy(): void {
+    if (!this.isDestroyed) {
+      this.isDestroyed = true;
+    }
+  }
 
   /**
    * Releases the conviva analytics.
