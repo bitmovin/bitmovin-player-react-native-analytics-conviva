@@ -1,3 +1,6 @@
+/**
+ * Configuration options for the Conviva SDK Integration.
+ */
 export interface ConvivaConfig {
   /**
    * The `TOUCHSTONE_SERVICE_URL` for testing with Touchstone. Only to be used for development,

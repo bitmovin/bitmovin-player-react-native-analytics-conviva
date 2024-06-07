@@ -9,9 +9,24 @@ import { Platform } from 'react-native';
  * @platform Android, iOS, tvOS
  */
 export class ConvivaAnalytics {
-  player: Player;
-  customerKey: string;
-  config: ConvivaConfig;
+  /**
+   * The player instance which will be used for tracking.
+   * @platform Android, iOS, tvOS
+   * @readonly
+   */
+  readonly player: Player;
+  /**
+   * The customer key which will be used for tracking.
+   * @platform Android, iOS, tvOS
+   * @readonly
+   */
+  readonly customerKey: string;
+  /**
+   * The configuration for the conviva analytics.
+   * @platform Android, iOS, tvOS
+   * @readonly
+   */
+  readonly config: ConvivaConfig;
 
   /**
    * Creates a new instance of the ConvivaAnalytics.
