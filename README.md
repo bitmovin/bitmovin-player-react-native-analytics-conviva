@@ -91,7 +91,7 @@ For more information about permissions and collected network types please look a
 
 ### Compatibility
 
-Conviva Analytics Integration depends on `bitmovin-player-react-native` version `>= 0.24.0`.
+Conviva Analytics Integration depends on `bitmovin-player-react-native` version `>= 0.25.0`.
 
 ## Usage
 
