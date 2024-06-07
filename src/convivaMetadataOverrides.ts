@@ -1,4 +1,4 @@
-import type { StreamType } from './streamType';
+import type { ConvivaStreamType } from './convivaStreamType';
 
 /**
  * Metadata overrides for Conviva analytics.
@@ -9,7 +9,7 @@ export interface ConvivaMetadataOverrides {
 
   // Can only be set before playback started
   viewerId?: string;
-  streamType?: StreamType;
+  streamType?: ConvivaStreamType;
   applicationName?: string;
   custom?: { [key: string]: any };
   duration?: number;
