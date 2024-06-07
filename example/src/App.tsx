@@ -192,11 +192,23 @@ export default function App() {
     };
   }, [convivaAnalytics]);
 
+  const playerViewRef = useRef(null);
+
+  useEffect(() => {
+    if (playerViewRef.current !== null) {
+      convivaAnalytics?.setPlayerViewRef(playerViewRef);
+    }
+  }, [convivaAnalytics]);
+
   const Container = Platform.isTV ? View : SafeAreaView;
 
   return (
     <Container style={styles.container}>
-      <PlayerView style={styles.player} player={player} />
+      <PlayerView
+        style={styles.player}
+        player={player}
+        viewRef={playerViewRef}
+      />
       {!Platform.isTV && (
         <>
           <View style={styles.adControlContainer}>
