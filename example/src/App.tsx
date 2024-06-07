@@ -144,7 +144,7 @@ export default function App() {
   const sendCustomEvent = useCallback(async () => {
     const playerCurrentTime = await player.getCurrentTime();
     convivaAnalytics?.sendCustomPlaybackEvent('Custom Event', {
-      'at Time': Math.floor(playerCurrentTime),
+      'at Time': `${Math.floor(playerCurrentTime)}`,
     });
   }, [convivaAnalytics, player]);
 
@@ -176,7 +176,10 @@ export default function App() {
       ) {
         console.log('App has come to the foreground!');
         convivaAnalytics?.reportAppForegrounded();
-      } else {
+      } else if (
+        lastAppState.current === 'active' &&
+        newAppState.match(/inactive|background/)
+      ) {
         console.log('App has gone to the background!');
         convivaAnalytics?.reportAppBackgrounded();
       }

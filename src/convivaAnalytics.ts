@@ -68,9 +68,9 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    *
    * @platform Android, iOS, tvOS
    */
-  setPlayerViewRef = (viewRef: React.MutableRefObject<null>) => {
+  setPlayerViewRef = (viewRef: React.MutableRefObject<null> | undefined) => {
     // TODO: Implement setPlayerViewRef
-    console.log(`ConvivaAnalytics player view ref set to ${viewRef.current}`);
+    console.log(`ConvivaAnalytics player view ref set to ${viewRef?.current}`);
   };
 
   /**
@@ -105,7 +105,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    */
   sendCustomApplicationEvent = (
     name: string,
-    attributes: { [key: string]: any }
+    attributes: { [key: string]: string }
   ) => {
     // TODO: Implement sendCustomApplicationEvent
     console.log(
@@ -124,7 +124,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    */
   sendCustomPlaybackEvent = (
     name: string,
-    attributes: { [key: string]: any }
+    attributes: { [key: string]: string }
   ) => {
     // TODO: Implement sendCustomPlaybackEvent
     console.log(
