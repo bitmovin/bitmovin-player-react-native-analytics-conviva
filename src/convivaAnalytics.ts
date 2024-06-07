@@ -82,14 +82,14 @@ export class ConvivaAnalytics {
   };
 
   /**
-   * Set the PlayerView to enable view triggered events like fullscreen state changes
-   * @param viewRef reference to the PlayerView passed via `<PlayerView viewRef={viewRef}>`
+   * Set the `PlayerView.viewRef` to enable view triggered events like fullscreen state changes
+   * @param viewRef reference to the `PlayerView` passed via `<PlayerView viewRef={viewRef}>`
    *
    * @platform Android, iOS, tvOS
    */
   setPlayerViewRef = (viewRef: React.MutableRefObject<null>) => {
     // TODO: Implement setPlayerViewRef
-    console.log(`ConvivaAnalytics player view ref set to ${viewRef}`);
+    console.log(`ConvivaAnalytics player view ref set to ${viewRef.current}`);
   };
 
   /**

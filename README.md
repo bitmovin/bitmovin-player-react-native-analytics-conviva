@@ -166,7 +166,7 @@ const player = usePlayer();
 
 useEffect(() => {
   convivaAnalytics.setPlayerViewRef(playerViewRef);
-}, [playerViewRef]);
+}, [convivaAnalytics]);
 
 <PlayerView viewRef={playerViewRef} player={player} />;
 ```
