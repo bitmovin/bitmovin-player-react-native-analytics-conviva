@@ -8,6 +8,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Platform,
+  AppState,
 } from 'react-native';
 import {
   PlayerView,
@@ -166,6 +167,29 @@ export default function App() {
   useEffect(() => {
     adsEnabledRef.current = adsEnabled;
   }, [adsEnabled]);
+
+  const lastAppState = useRef(AppState.currentState);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (newAppState) => {
+      if (
+        lastAppState.current.match(/inactive|background/) &&
+        newAppState === 'active'
+      ) {
+        console.log('App has come to the foreground!');
+        convivaAnalytics?.reportAppForegrounded();
+      } else {
+        console.log('App has gone to the background!');
+        convivaAnalytics?.reportAppBackgrounded();
+      }
+
+      lastAppState.current = newAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [convivaAnalytics]);
 
   const Container = Platform.isTV ? View : SafeAreaView;
 

@@ -2,6 +2,7 @@ import type { Player } from 'bitmovin-player-react-native';
 import type { ConvivaConfig } from './convivaConfig';
 import type { ConvivaMetadataOverrides } from './convivaMetadataOverrides';
 import type { ConvivaErrorSeverity } from './convivaErrorSeverity';
+import { Platform } from 'react-native';
 
 /**
  * The ConvivaAnalytics class is used to interact with the Conviva Analytics SDK.
@@ -180,18 +181,30 @@ export class ConvivaAnalytics {
 
   /**
    * This should be called when the app is resumed.
+   *
+   * This is only available on Android and will have no effect on iOS and tvOS.
+   *
    * @platform Android
    */
   reportAppForegrounded = () => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
     // TODO: Implement reportAppForegrounded
     console.log('ConvivaAnalytics app foregrounded');
   };
 
   /**
    * This should be called when the app is paused.
+   *
+   * This is only available on Android and will have no effect on iOS and tvOS.
+   *
    * @platform Android
    */
   reportAppBackgrounded = () => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
     // TODO: Implement reportAppBackgrounded
     console.log('ConvivaAnalytics app backgrounded');
   };
