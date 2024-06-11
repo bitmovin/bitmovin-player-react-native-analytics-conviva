@@ -174,7 +174,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * Puts the session state in a notMonitored state.
    *
    * @param isBumper If tracking is paused in order to display a bumper video (or similar), set this to true.
-   *                  Otherwise the event is regarded as a "user wait"-event.
+   *                 Otherwise the event is regarded as a "user wait"-event.
    *
    * @platform Android, iOS, tvOS
    */
