@@ -7,4 +7,4 @@ import com.facebook.react.uimanager.UIManagerModule
 inline fun <reified T : ReactContextBaseJavaModule> ReactContext.getModule(): T? {
     return getNativeModule(T::class.java)
 }
-val ReactApplicationContext.uiManagerModule get() =  getModule<UIManagerModule>()
+val ReactApplicationContext.uiManagerModule get() = getModule<UIManagerModule>()
