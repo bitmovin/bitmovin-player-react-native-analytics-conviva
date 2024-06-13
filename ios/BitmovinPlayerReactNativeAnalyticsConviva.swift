@@ -87,7 +87,11 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
 
     @objc(destroy:)
     func destroy(_ nativeId: NativeId) {
-        convivaAnalyticsInstances.removeValue(forKey: nativeId)
+        bridge.uiManager.addUIBlock { [weak self] _, _ in
+            guard let self else { return }
+            self.convivaAnalyticsInstances[nativeId]?.release()
+            self.convivaAnalyticsInstances.removeValue(forKey: nativeId)
+        }
     }
 
     @objc(release:)
