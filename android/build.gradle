@@ -107,7 +107,3 @@ dependencies {
   implementation project(':bitmovin-player-react-native')
   implementation 'com.bitmovin.player:player:+'
 }
-
-ktlint {
-  verbose = true
-}
