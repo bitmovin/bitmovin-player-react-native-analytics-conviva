@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.0] - 2024-06-14
 
 Adds support for Conviva Analytics with Bitmovin Player React Native SDK.
 
