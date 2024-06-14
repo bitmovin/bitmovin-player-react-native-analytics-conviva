@@ -70,9 +70,15 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * Set the `PlayerView.viewRef` to enable view triggered events like fullscreen state changes
    * @param viewRef reference to the `PlayerView` passed via `<PlayerView viewRef={viewRef}>`
    *
-   * @platform Android, iOS, tvOS
+   * @platform iOS, tvOS
    */
   setPlayerViewRef = (viewRef: React.MutableRefObject<null> | undefined) => {
+    if (Platform.OS !== 'ios') {
+      console.warn(
+        `[ConvivaAnalytics ${this.nativeId}] Method setPlayerViewRef is not available for Android. Only iOS and tvOS devices.`
+      );
+      return;
+    }
     if (viewRef !== undefined && viewRef.current !== null) {
       const node = findNodeHandle(viewRef.current);
       BitmovinPlayerReactNativeAnalyticsConviva.setPlayerViewRef(
@@ -202,6 +208,9 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    */
   reportAppForegrounded = () => {
     if (Platform.OS !== 'android') {
+      console.warn(
+        `[ConvivaAnalytics ${this.nativeId}] Method reportAppForegrounded is not available for iOS and tvOS. Only Android devices.`
+      );
       return;
     }
     BitmovinPlayerReactNativeAnalyticsConviva.reportAppForegrounded(
@@ -218,6 +227,9 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    */
   reportAppBackgrounded = () => {
     if (Platform.OS !== 'android') {
+      console.warn(
+        `[ConvivaAnalytics ${this.nativeId}] Method reportAppBackgrounded is not available for iOS and tvOS. Only Android devices.`
+      );
       return;
     }
     BitmovinPlayerReactNativeAnalyticsConviva.reportAppBackgrounded(

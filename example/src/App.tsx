@@ -170,33 +170,36 @@ export default function App() {
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (newAppState) => {
-      if (
-        lastAppState.current.match(/inactive|background/) &&
-        newAppState === 'active'
-      ) {
-        console.log('App has come to the foreground!');
-        convivaAnalytics?.reportAppForegrounded();
-      } else if (
-        lastAppState.current === 'active' &&
-        newAppState.match(/inactive|background/)
-      ) {
-        console.log('App has gone to the background!');
-        convivaAnalytics?.reportAppBackgrounded();
-      }
+      if (Platform.OS === 'android') {
+        if (
+          lastAppState.current.match(/inactive|background/) &&
+          newAppState === 'active'
+        ) {
+          console.log('App has come to the foreground!');
+          convivaAnalytics?.reportAppForegrounded();
+        } else if (
+          lastAppState.current === 'active' &&
+          newAppState.match(/inactive|background/)
+        ) {
+          console.log('App has gone to the background!');
+          convivaAnalytics?.reportAppBackgrounded();
+        }
 
-      lastAppState.current = newAppState;
+        lastAppState.current = newAppState;
+      }
     });
 
     return () => {
       subscription.remove();
     };
   }, [convivaAnalytics]);
-
   const playerViewRef = useRef(null);
 
   useEffect(() => {
-    if (playerViewRef.current !== null) {
-      convivaAnalytics?.setPlayerViewRef(playerViewRef);
+    if (Platform.OS === 'ios') {
+      if (playerViewRef.current !== null) {
+        convivaAnalytics?.setPlayerViewRef(playerViewRef);
+      }
     }
   }, [convivaAnalytics]);
 

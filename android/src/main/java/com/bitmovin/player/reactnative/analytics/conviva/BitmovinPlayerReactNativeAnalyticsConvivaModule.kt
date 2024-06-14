@@ -1,25 +1,162 @@
 package com.bitmovin.player.reactnative.analytics.conviva
 
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
+import android.util.Log
+import com.bitmovin.analytics.conviva.ConvivaAnalyticsIntegration
+import com.bitmovin.analytics.conviva.ConvivaConfig
+import com.bitmovin.player.reactnative.analytics.conviva.converter.toErrorSeverity
+import com.bitmovin.player.reactnative.analytics.conviva.converter.toMetadataOverrides
+import com.bitmovin.player.reactnative.extensions.playerModule
+import com.bitmovin.player.reactnative.extensions.toMap
+import com.facebook.react.bridge.*
 
-class BitmovinPlayerReactNativeAnalyticsConvivaModule(reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext) {
+class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationContext) :
+    BitmovinBaseModule(context) {
 
-  override fun getName(): String {
-    return NAME
-  }
+    private val convivaAnalyticsInstances: Registry<ConvivaAnalyticsIntegration> = mutableMapOf()
 
-  // Example method
-  // See https://reactnative.dev/docs/native-modules-android
-  @ReactMethod
-  fun message(prefix: String, promise: Promise) {
-    promise.resolve("$prefix on Android!")
-  }
+    override fun getName(): String {
+        return NAME
+    }
 
-  companion object {
-    const val NAME = "BitmovinPlayerReactNativeAnalyticsConviva"
-  }
+    @ReactMethod
+    fun initWithConfig(
+        nativeId: NativeId,
+        playerNativeId: NativeId,
+        customerKey: String,
+        gatewayUrl: String?,
+        debugLoggingEnabled: Boolean,
+        promise: Promise,
+    ) {
+        promise.unit.resolveOnUiThread {
+            val player = context.playerModule?.getPlayerOrNull(playerNativeId)
+            if (player === null) {
+                promise.reject(NAME, "Could not retrieve Player with native Id $playerNativeId)")
+                return@resolveOnUiThread
+            }
+
+            val config = ConvivaConfig()
+            config.gatewayUrl = gatewayUrl
+            config.isDebugLoggingEnabled = debugLoggingEnabled
+            val convivaAnalytics = ConvivaAnalyticsIntegration(
+                player,
+                customerKey,
+                context,
+                config,
+            )
+            convivaAnalyticsInstances[nativeId] = convivaAnalytics
+
+            Log.d("[dev]", "ConvivaAnalyticsIntegration initialized with nativeId: $nativeId")
+
+            promise.resolve(null)
+        }
+    }
+
+    @ReactMethod
+    fun destroy(nativeId: NativeId, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            release()
+            convivaAnalyticsInstances.remove(nativeId)
+        }
+    }
+
+    @ReactMethod
+    fun release(nativeId: NativeId, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            release()
+        }
+    }
+
+    @ReactMethod
+    fun endSession(nativeId: NativeId, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            endSession()
+        }
+    }
+
+    @ReactMethod
+    fun updateContentMetadata(nativeId: NativeId, contentMetadata: ReadableMap, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            updateContentMetadata(contentMetadata.toMetadataOverrides())
+        }
+    }
+
+    @ReactMethod
+    fun sendCustomApplicationEvent(nativeId: NativeId, name: String, attributes: ReadableMap, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            sendCustomApplicationEvent(name, attributes.toMap())
+        }
+    }
+
+    @ReactMethod
+    fun sendCustomPlaybackEvent(nativeId: NativeId, name: String, attributes: ReadableMap, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            sendCustomPlaybackEvent(name, attributes.toMap())
+        }
+    }
+
+    @ReactMethod
+    fun reportPlaybackDeficiency(
+        nativeId: NativeId,
+        message: String,
+        severity: String,
+        endSession: Boolean,
+        promise: Promise,
+    ) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            reportPlaybackDeficiency(message, severity.toErrorSeverity(), endSession)
+        }
+    }
+
+    @ReactMethod
+    fun pauseTracking(nativeId: NativeId, isBumper: Boolean, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            pauseTracking(isBumper)
+        }
+    }
+
+    @ReactMethod
+    fun resumeTracking(nativeId: NativeId, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            resumeTracking()
+        }
+    }
+
+    @ReactMethod
+    fun reportAppForegrounded(nativeId: NativeId, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            reportAppForegrounded()
+        }
+    }
+
+    @ReactMethod
+    fun reportAppBackgrounded(nativeId: NativeId, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            reportAppBackgrounded()
+        }
+    }
+
+    private inline fun <T> TPromise<T>.resolveOnUiThreadWithConvivaAnalytics(
+        nativeId: NativeId,
+        crossinline block: ConvivaAnalyticsIntegration.() -> T,
+    ) = resolveOnUiThread {
+        getConvivaAnalytics(nativeId, this@BitmovinPlayerReactNativeAnalyticsConvivaModule).block()
+    }
+
+    private fun RejectPromiseOnExceptionBlock.getConvivaAnalytics(
+        nativeId: NativeId,
+        convivaModule: BitmovinPlayerReactNativeAnalyticsConvivaModule =
+            this@BitmovinPlayerReactNativeAnalyticsConvivaModule,
+    ): ConvivaAnalyticsIntegration {
+        return convivaModule.getConvivaAnalyticsOrNull(nativeId) ?: throw IllegalArgumentException(
+            "Invalid BitmovinPlayerReactNativeAnalyticsConviva $nativeId",
+        )
+    }
+
+    private fun getConvivaAnalyticsOrNull(nativeId: NativeId): ConvivaAnalyticsIntegration? {
+        return convivaAnalyticsInstances[nativeId]
+    }
+
+    companion object {
+        const val NAME = "BitmovinPlayerReactNativeAnalyticsConviva"
+    }
 }

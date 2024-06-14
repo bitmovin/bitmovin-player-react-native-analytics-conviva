@@ -41,6 +41,7 @@ jobs:
         uses: ./.github/actions/setup-environment
         with:
           java: true
+          node: true
 
       - name: Check code style
         run: ./gradlew ktlintCheck
