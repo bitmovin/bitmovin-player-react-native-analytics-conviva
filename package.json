@@ -29,7 +29,7 @@
     "example": "yarn workspace bitmovin-player-react-native-analytics-conviva-example",
     "test": "jest",
     "typescript": "tsc --noEmit",
-    "lint": "eslint --max-warnings=0 -- \"**/*.{ts,tsx}\"",
+    "lint": "eslint . --max-warnings=0 --ext .ts,.tsx",
     "format": "prettier --write .",
     "build": "tsup ./src/index.ts --dts --target es2020 --format cjs,esm -d lib",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
