@@ -8,6 +8,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Platform,
+  AppState,
 } from 'react-native';
 import {
   PlayerView,
@@ -17,6 +18,10 @@ import {
 } from 'bitmovin-player-react-native';
 import validator from 'validator';
 import { useTVGestures } from '../hooks';
+import { ConvivaAnalytics } from 'bitmovin-player-react-native-analytics-conviva';
+
+const CONVIVA_CUSTOMER_KEY = 'YOUR-CONVIVA-CUSTOMER-KEY';
+const CONVIVA_GATEWAY_URL: string | undefined = undefined;
 
 const withCorrelator = (tag: string): string =>
   `${tag}${Math.floor(Math.random() * 100000)}`;
@@ -85,6 +90,27 @@ export default function App() {
 
   const [player, setPlayer] = useState(createPlayer());
 
+  const createConvivaAnalytics = useCallback(async () => {
+    const convivaAnalytics = new ConvivaAnalytics({
+      player: player,
+      customerKey: CONVIVA_CUSTOMER_KEY,
+      debugLoggingEnabled: true,
+      gatewayUrl: CONVIVA_GATEWAY_URL,
+    });
+    await convivaAnalytics.initialize();
+    convivaAnalytics.updateContentMetadata({
+      applicationName: 'Bitmovin iOS Conviva integration example app',
+      viewerId: 'awesomeViewerId',
+      custom: { custom_tag: 'Episode' },
+      additionalStandardTags: { 'c3.cm.contentType': 'VOD' },
+    });
+    return convivaAnalytics;
+  }, [player]);
+
+  const [convivaAnalytics, setConvivaAnalytics] = useState<
+    ConvivaAnalytics | undefined
+  >(undefined);
+
   const loadAsset = useCallback(
     (url: string) =>
       player.load({
@@ -103,29 +129,36 @@ export default function App() {
   }, [createPlayer]);
 
   const release = useCallback(() => {
-    // TODO release conviva analytics
+    convivaAnalytics?.release();
     player.unload();
-  }, [player]);
+  }, [player, convivaAnalytics]);
 
   const pauseTracking = useCallback(() => {
-    // TODO: Implement pause tracking
-  }, []);
+    convivaAnalytics?.pauseTracking(false);
+  }, [convivaAnalytics]);
 
   const resumeTracking = useCallback(() => {
-    // TODO: Implement resume tracking
-  }, []);
+    convivaAnalytics?.resumeTracking();
+  }, [convivaAnalytics]);
 
-  const sendCustomEvent = useCallback(() => {
-    // TODO: Implement send custom event
-  }, []);
+  const sendCustomEvent = useCallback(async () => {
+    const playerCurrentTime = await player.getCurrentTime();
+    convivaAnalytics?.sendCustomPlaybackEvent('Custom Event', {
+      'at Time': `${Math.floor(playerCurrentTime)}`,
+    });
+  }, [convivaAnalytics, player]);
 
   useEffect(() => {
     const urlToLoad =
       assetUrlRef.current !== undefined && validator.isURL(assetUrlRef.current)
         ? assetUrlRef.current
         : 'https://bitmovin-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8';
-    loadAsset(urlToLoad);
-  }, [loadAsset, player]);
+
+    createConvivaAnalytics().then((newConvivaAnalytics) => {
+      setConvivaAnalytics(newConvivaAnalytics);
+      loadAsset(urlToLoad);
+    });
+  }, [createConvivaAnalytics, loadAsset]);
 
   const [adsEnabled, setAdsEnabled] = useState(true);
 
@@ -133,11 +166,49 @@ export default function App() {
     adsEnabledRef.current = adsEnabled;
   }, [adsEnabled]);
 
+  const lastAppState = useRef(AppState.currentState);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (newAppState) => {
+      if (
+        lastAppState.current.match(/inactive|background/) &&
+        newAppState === 'active'
+      ) {
+        console.log('App has come to the foreground!');
+        convivaAnalytics?.reportAppForegrounded();
+      } else if (
+        lastAppState.current === 'active' &&
+        newAppState.match(/inactive|background/)
+      ) {
+        console.log('App has gone to the background!');
+        convivaAnalytics?.reportAppBackgrounded();
+      }
+
+      lastAppState.current = newAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [convivaAnalytics]);
+
+  const playerViewRef = useRef(null);
+
+  useEffect(() => {
+    if (playerViewRef.current !== null) {
+      convivaAnalytics?.setPlayerViewRef(playerViewRef);
+    }
+  }, [convivaAnalytics]);
+
   const Container = Platform.isTV ? View : SafeAreaView;
 
   return (
     <Container style={styles.container}>
-      <PlayerView style={styles.player} player={player} />
+      <PlayerView
+        style={styles.player}
+        player={player}
+        viewRef={playerViewRef}
+      />
       {!Platform.isTV && (
         <>
           <View style={styles.adControlContainer}>
