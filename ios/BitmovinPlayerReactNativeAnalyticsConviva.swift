@@ -175,7 +175,7 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
         }
     }
 
-    @objc(sendCustomPlaybackEvent:message:severity:endSession:)
+    @objc(reportPlaybackDeficiency:message:severity:endSession:)
     func reportPlaybackDeficiency(
         _ nativeId: NativeId,
         message: String,
@@ -216,12 +216,11 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
 
     private func retrievePlayer(nativeId: String) -> Player? {
         guard let playerModule = self.bridge.module(for: PlayerModule.self) as? PlayerModule,
-              playerModule.responds(to: #selector(PlayerModuleProtocol.retrieve(_:))),
-              let player = playerModule.perform(#selector(PlayerModuleProtocol.retrieve(_:)), with: nativeId)
-              .takeUnretainedValue() as? Player else {
+              playerModule.responds(to: #selector(PlayerModuleProtocol.retrieve(_:))) else {
             return nil
         }
-        return player
+        return playerModule.perform(#selector(PlayerModuleProtocol.retrieve(_:)), with: nativeId)
+            .takeUnretainedValue() as? Player
     }
 }
 
