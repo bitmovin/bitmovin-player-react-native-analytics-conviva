@@ -186,6 +186,8 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
             guard let self,
                   let conviva = self.retrieve(nativeId),
                   let severityValue = RCTConvert.severity(severity) else { return }
+            // Reset metadata to align behavior with Android
+            conviva.updateContentMetadata(metadataOverrides: MetadataOverrides())
             conviva.reportPlaybackDeficiency(
                 message: message,
                 severity: severityValue,
