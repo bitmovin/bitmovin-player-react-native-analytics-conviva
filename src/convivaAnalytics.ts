@@ -1,8 +1,10 @@
 import type { ConvivaMetadataOverrides } from './convivaMetadataOverrides';
 import type { ConvivaErrorSeverity } from './convivaErrorSeverity';
-import { Platform } from 'react-native';
+import { Platform, NativeModules, findNodeHandle } from 'react-native';
 import NativeInstance from './nativeInstance';
 import type { ConvivaAnalyticsConfig } from './convivaAnalyticsConfig';
+
+const { BitmovinPlayerReactNativeAnalyticsConviva } = NativeModules;
 
 /**
  * The ConvivaAnalytics class is used to interact with the Conviva Analytics SDK.
@@ -19,14 +21,17 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   initialize = async (): Promise<void> => {
-    // TODO: Implement initialization
-    console.log('ConvivaAnalytics initialized');
-
     if (this.isInitialized) {
       return;
     }
     this.isInitialized = true;
-    return Promise.resolve();
+    return BitmovinPlayerReactNativeAnalyticsConviva.initWithConfig(
+      this.nativeId,
+      this.config?.player.nativeId,
+      this.config?.customerKey,
+      this.config?.gatewayUrl,
+      this.config?.debugLoggingEnabled ?? false
+    );
   };
 
   /**
@@ -34,6 +39,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    */
   destroy(): void {
     if (!this.isDestroyed) {
+      BitmovinPlayerReactNativeAnalyticsConviva.destroy(this.nativeId);
       this.isDestroyed = true;
     }
   }
@@ -44,8 +50,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   release = () => {
-    // TODO: Implement release
-    console.log('ConvivaAnalytics released');
+    BitmovinPlayerReactNativeAnalyticsConviva.release(this.nativeId);
   };
 
   /**
@@ -58,8 +63,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   endSession = () => {
-    // TODO: Implement endSession
-    console.log('ConvivaAnalytics session ended');
+    BitmovinPlayerReactNativeAnalyticsConviva.endSession(this.nativeId);
   };
 
   /**
@@ -69,8 +73,17 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   setPlayerViewRef = (viewRef: React.MutableRefObject<null> | undefined) => {
-    // TODO: Implement setPlayerViewRef
-    console.log(`ConvivaAnalytics player view ref set to ${viewRef?.current}`);
+    if (viewRef !== undefined && viewRef.current !== null) {
+      const node = findNodeHandle(viewRef.current);
+      BitmovinPlayerReactNativeAnalyticsConviva.setPlayerViewRef(
+        this.nativeId,
+        node
+      );
+    } else {
+      BitmovinPlayerReactNativeAnalyticsConviva.resetPlayerViewRef(
+        this.nativeId
+      );
+    }
   };
 
   /**
@@ -88,9 +101,9 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   updateContentMetadata = (metadata: ConvivaMetadataOverrides) => {
-    // TODO: Implement updateContentMetadata
-    console.log(
-      `ConvivaAnalytics content metadata updated with ${JSON.stringify(metadata)}`
+    BitmovinPlayerReactNativeAnalyticsConviva.updateContentMetadata(
+      this.nativeId,
+      metadata
     );
   };
 
@@ -107,9 +120,10 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     name: string,
     attributes: { [key: string]: string }
   ) => {
-    // TODO: Implement sendCustomApplicationEvent
-    console.log(
-      `ConvivaAnalytics custom application event sent with name ${name} and attributes ${JSON.stringify(attributes)}`
+    BitmovinPlayerReactNativeAnalyticsConviva.sendCustomApplicationEvent(
+      this.nativeId,
+      name,
+      attributes
     );
   };
 
@@ -126,9 +140,10 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     name: string,
     attributes: { [key: string]: string }
   ) => {
-    // TODO: Implement sendCustomPlaybackEvent
-    console.log(
-      `ConvivaAnalytics custom playback event sent with name ${name} and attributes ${JSON.stringify(attributes)}`
+    BitmovinPlayerReactNativeAnalyticsConviva.sendCustomPlaybackEvent(
+      this.nativeId,
+      name,
+      attributes
     );
   };
 
@@ -147,9 +162,11 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     severity: ConvivaErrorSeverity,
     endSession: boolean = true
   ) => {
-    // TODO: Implement reportPlaybackDeficiency
-    console.log(
-      `ConvivaAnalytics playback deficiency reported with message ${message}, severity ${severity}, and endSession ${endSession}`
+    BitmovinPlayerReactNativeAnalyticsConviva.reportPlaybackDeficiency(
+      this.nativeId,
+      message,
+      severity,
+      endSession
     );
   };
 
@@ -162,8 +179,10 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   pauseTracking = (isBumper: boolean) => {
-    // TODO: Implement pauseTracking
-    console.log(`ConvivaAnalytics tracking paused with bumper: ${isBumper}`);
+    BitmovinPlayerReactNativeAnalyticsConviva.pauseTracking(
+      this.nativeId,
+      isBumper
+    );
   };
 
   /**
@@ -171,8 +190,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   resumeTracking = () => {
-    // TODO: Implement resumeTracking
-    console.log('ConvivaAnalytics tracking resumed');
+    BitmovinPlayerReactNativeAnalyticsConviva.resumeTracking(this.nativeId);
   };
 
   /**
@@ -186,8 +204,9 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     if (Platform.OS !== 'android') {
       return;
     }
-    // TODO: Implement reportAppForegrounded
-    console.log('ConvivaAnalytics app foregrounded');
+    BitmovinPlayerReactNativeAnalyticsConviva.reportAppForegrounded(
+      this.nativeId
+    );
   };
 
   /**
@@ -201,7 +220,8 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     if (Platform.OS !== 'android') {
       return;
     }
-    // TODO: Implement reportAppBackgrounded
-    console.log('ConvivaAnalytics app backgrounded');
+    BitmovinPlayerReactNativeAnalyticsConviva.reportAppBackgrounded(
+      this.nativeId
+    );
   };
 }
