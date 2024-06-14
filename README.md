@@ -97,15 +97,15 @@ Conviva Analytics Integration depends on `bitmovin-player-react-native` version 
 
 ### Basic Setup
 
-The following example shows how to setup the `BitmovinConvivaAnalytics`:
+The following example shows how to setup the Conviva Analytics integration with the Bitmovin Player React Native SDK:
 
 ```ts
 const player = usePlayer();
 
-const convivaAnalytics = ConvivaAnalytics(
+const convivaAnalytics = useConvivaAnalytics({
   player: player,
   customerKey: 'YOUR-CONVIVA-CUSTOMER-KEY',
-);
+});
 
 const onConvivaSetupError = useCallback((error) => {
   console.error('Conviva error', error);
@@ -156,7 +156,7 @@ convivaAnalytics.endSession();
 Since the `BitmovinPlayer` automatically pauses the video if no background playback is supported the session creation after
 the app is in foreground again is handled automatically.
 
-### UI events
+### UI events (iOS and tvOS only)
 
 If you want to track UI related events such as full-screen state changes add the following after initializing the `PlayerView` with a `viewRef` parameter like:
 
