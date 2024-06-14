@@ -121,6 +121,20 @@ class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationC
         }
     }
 
+    @ReactMethod
+    fun reportAppForegrounded(nativeId: NativeId, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            reportAppForegrounded()
+        }
+    }
+
+    @ReactMethod
+    fun reportAppBackgrounded(nativeId: NativeId, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            reportAppBackgrounded()
+        }
+    }
+
     private inline fun <T> TPromise<T>.resolveOnUiThreadWithConvivaAnalytics(
         nativeId: NativeId,
         crossinline block: ConvivaAnalyticsIntegration.() -> T,
