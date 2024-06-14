@@ -1,5 +1,5 @@
 PODS:
-  - bitmovin-player-react-native-analytics-conviva (0.1.0):
+  - bitmovin-player-react-native-analytics-conviva (1.0.0):
     - BitmovinConvivaAnalytics
     - DoubleConversion
     - glog
@@ -1377,7 +1377,7 @@ CHECKOUT OPTIONS:
     :tag: 3.2.0
 
 SPEC CHECKSUMS:
-  bitmovin-player-react-native-analytics-conviva: 0552486c064bb3613e5479b027a6763a9403c979
+  bitmovin-player-react-native-analytics-conviva: 19dc365ec0d653e864ceeb68698b8d541c4e0bce
   BitmovinAnalyticsCollector: bbd82c0b8e11aefacd8e53b6e40c62f2cba6f3f5
   BitmovinConvivaAnalytics: f7078baeee0fd5d95afd936dfb4e2d8b35b6a27d
   BitmovinPlayer: f69350e5db2f57ad950108ec829b7c7a4b360d00
@@ -1439,7 +1439,7 @@ SPEC CHECKSUMS:
   ReactCommon: 678c6fdb479e7533859f29000d899af37d3a6c7a
   RNBitmovinPlayer: f2c78273cbb5de5b98609b6ed624fd8aa9a0da07
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: bb33480fd76c5cb82ef4ba27c49276abfdd692d1
+  Yoga: d84d1e521e3f8fa3cdd139d617ddf6514d061c78
 
 PODFILE CHECKSUM: 5c9067c054eef9eb3b42e63f4115319d2603215f
 
