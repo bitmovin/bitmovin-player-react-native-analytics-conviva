@@ -1,17 +1,20 @@
 {
   "name": "bitmovin-player-react-native-analytics-conviva-example",
+  "description": "Example app showcasing Bitmovin's React Native Player SDK Conviva Analytics Integration",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "build:android": "cd android && ./gradlew assembleDebug --no-daemon --console=plain -PreactNativeArchitectures=arm64-v8a",
-    "build:ios": "cd ios && xcodebuild -workspace BitmovinPlayerReactNativeAnalyticsConvivaExample.xcworkspace -scheme BitmovinPlayerReactNativeAnalyticsConvivaExample -configuration Debug -sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO"
+    "pods": "yarn pods-install || yarn pods-update",
+    "pods-install": "NO_FLIPPER=1 yarn pod-install",
+    "pods-update": "NO_FLIPPER=1 pod update --silent --project-directory=ios"
   },
   "dependencies": {
+    "bitmovin-player-react-native": "0.25.0",
     "react": "18.2.0",
-    "react-native": "0.74.1"
+    "react-native": "npm:react-native-tvos@0.74.1-0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -20,7 +23,10 @@
     "@react-native/babel-preset": "0.74.83",
     "@react-native/metro-config": "0.74.83",
     "@react-native/typescript-config": "0.74.83",
-    "babel-plugin-module-resolver": "^5.0.0"
+    "@types/validator": "^13.11.10",
+    "babel-plugin-module-resolver": "^5.0.0",
+    "pod-install": "^0.1.0",
+    "validator": "^13.12.0"
   },
   "engines": {
     "node": ">=18"

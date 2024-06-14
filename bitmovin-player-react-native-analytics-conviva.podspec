@@ -11,8 +11,13 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => min_ios_version_supported }
-  s.source       = { :git => "https://github.com/bitmovin/bitmovin-player-react-native-analytics-conviva.git", :tag => "#{s.version}" }
+  s.platforms    = { :ios => "14.0", :tvos => "14.0" }
+  s.source       = {
+    :git => "https://github.com/bitmovin/bitmovin-player-react-native-analytics-conviva.git",
+    :tag => "#{s.version}"
+  }
+  s.dependency "BitmovinConvivaAnalytics" # 3.2.0 or newer
+  s.dependency "RNBitmovinPlayer"
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
 

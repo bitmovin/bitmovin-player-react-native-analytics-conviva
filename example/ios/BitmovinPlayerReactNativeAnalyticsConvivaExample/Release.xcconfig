@@ -1,0 +1,2 @@
+#include? "Pods/Target Support Files/Pods-BitmovinPlayerReactNativeAnalyticsConvivaExample/Pods-BitmovinPlayerReactNativeAnalyticsConvivaExample.release.xcconfig"
+#include? "Developer.xcconfig"
