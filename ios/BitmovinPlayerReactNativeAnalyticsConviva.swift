@@ -175,7 +175,7 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
         }
     }
 
-    @objc(sendCustomPlaybackEvent:message:severity:endSession:)
+    @objc(reportPlaybackDeficiency:message:severity:endSession:)
     func reportPlaybackDeficiency(
         _ nativeId: NativeId,
         message: String,
