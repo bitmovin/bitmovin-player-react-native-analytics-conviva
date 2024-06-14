@@ -66,7 +66,7 @@ jobs:
 
       - name: Bump package.json version
         run: |
-          yarn version --new-version ${{ inputs.version_number }} --no-git-tag-version
+          jq --arg v "${{ inputs.version_number }}" '.version = $v' package.json > tmp.json && mv tmp.json package.json
 
       - name: Set up CocoaPods
         run: |
