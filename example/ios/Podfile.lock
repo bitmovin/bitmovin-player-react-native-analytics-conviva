@@ -26,8 +26,8 @@ PODS:
     - BitmovinAnalyticsCollector/Core
     - BitmovinPlayerCore (~> 3.48)
   - BitmovinAnalyticsCollector/Core (3.7.0)
-  - BitmovinConvivaAnalytics (3.2.0):
-    - BitmovinPlayer (~> 3.63)
+  - BitmovinConvivaAnalytics (3.3.0):
+    - BitmovinPlayer (~> 3.64)
     - ConvivaSDK (~> 4.0)
   - BitmovinPlayer (3.64.0):
     - BitmovinAnalyticsCollector/BitmovinPlayer (~> 3.0)
@@ -1186,7 +1186,7 @@ PODS:
 
 DEPENDENCIES:
   - bitmovin-player-react-native-analytics-conviva (from `../..`)
-  - BitmovinConvivaAnalytics (from `https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git`, tag `3.2.0`)
+  - BitmovinConvivaAnalytics (from `https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git`, tag `3.3.0`)
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -1260,7 +1260,7 @@ EXTERNAL SOURCES:
     :path: "../.."
   BitmovinConvivaAnalytics:
     :git: https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git
-    :tag: 3.2.0
+    :tag: 3.3.0
   boost:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
@@ -1374,12 +1374,12 @@ EXTERNAL SOURCES:
 CHECKOUT OPTIONS:
   BitmovinConvivaAnalytics:
     :git: https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git
-    :tag: 3.2.0
+    :tag: 3.3.0
 
 SPEC CHECKSUMS:
   bitmovin-player-react-native-analytics-conviva: 19dc365ec0d653e864ceeb68698b8d541c4e0bce
   BitmovinAnalyticsCollector: bbd82c0b8e11aefacd8e53b6e40c62f2cba6f3f5
-  BitmovinConvivaAnalytics: f7078baeee0fd5d95afd936dfb4e2d8b35b6a27d
+  BitmovinConvivaAnalytics: 263a2f7aee931eb1aa6274bf997ab7453d580c4a
   BitmovinPlayer: f69350e5db2f57ad950108ec829b7c7a4b360d00
   BitmovinPlayerCore: 1553570729eed0a64cdfbd06d16c39d69d7e701f
   boost: 88202336c3ba1e7a264a83c0c888784b0f360c28
@@ -1441,6 +1441,6 @@ SPEC CHECKSUMS:
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: bb33480fd76c5cb82ef4ba27c49276abfdd692d1
 
-PODFILE CHECKSUM: 5c9067c054eef9eb3b42e63f4115319d2603215f
+PODFILE CHECKSUM: f3eb1c4b0a98d1f6673aaee3005ffb38ccbec67d
 
 COCOAPODS: 1.15.2
