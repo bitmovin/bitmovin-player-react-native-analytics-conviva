@@ -20,9 +20,9 @@ class BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule(context: ReactApplicat
     }
 
     @ReactMethod
-    fun reportAdBreakStarted(nativeId: NativeId, adBreakInfo: ReadableMap, promise: Promise) {
+    fun reportAdBreakStarted(nativeId: NativeId, adBreakInfo: ReadableMap?, promise: Promise) {
         promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            ssai.reportAdBreakStarted(adBreakInfo.toMap())
+            ssai.reportAdBreakStarted(adBreakInfo?.toMap())
             promise.resolve(null)
         }
     }
