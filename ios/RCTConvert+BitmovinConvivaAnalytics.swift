@@ -27,7 +27,7 @@ extension RCTConvert {
         metadataOverrides.encodedFramerate = (json["encodedFramerate"] as? NSNumber)?.intValue
         metadataOverrides.defaultResource = json["defaultResource"] as? String
         metadataOverrides.streamUrl = json["streamUrl"] as? String
-        metadataOverrides.imaSdkVerison = json["imaSdkVersion"] as? String
+        metadataOverrides.imaSdkVersion = json["imaSdkVersion"] as? String
         return metadataOverrides
     }
 
@@ -39,6 +39,32 @@ extension RCTConvert {
             return .CONVIVA_STREAM_LIVE
         case "VOD":
             return .CONVIVA_STREAM_VOD
+        default:
+            return nil
+        }
+    }
+
+    static func adInfo(_ json: [String: Any]) -> SsaiAdInfo {
+        SsaiAdInfo(
+            title: json["title"] as? String,
+            duration: json["duration"] as? Double,
+            id: json["id"] as? String,
+            adSystem: json["adSystem"] as? String,
+            position: RCTConvert.adPosition(json["position"] as? String),
+            isSlate: json["isSlate"] as? Bool ?? false,
+            adStitcher: json["adStitcher"] as? String,
+            additionalMetadata: json["additionalMetadata"] as? [String: Any]
+        )
+    }
+
+    static func adPosition(_ json: String?) -> SsaiAdPosition? {
+        switch json {
+        case "preroll":
+            return .preroll
+        case "midroll":
+            return .midroll
+        case "postroll":
+            return .postroll
         default:
             return nil
         }
