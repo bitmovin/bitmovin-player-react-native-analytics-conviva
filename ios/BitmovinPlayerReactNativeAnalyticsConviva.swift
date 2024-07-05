@@ -25,7 +25,7 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
         bridge.uiManager.methodQueue
     }
 
-    private func retrieve(_ nativeId: NativeId) -> ConvivaAnalytics? {
+    internal func retrieve(_ nativeId: NativeId) -> ConvivaAnalytics? {
         convivaAnalyticsInstances[nativeId]
     }
 
