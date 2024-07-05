@@ -29,18 +29,18 @@ PODS:
   - BitmovinConvivaAnalytics (3.2.0):
     - BitmovinPlayer (~> 3.63)
     - ConvivaSDK (~> 4.0)
-  - BitmovinPlayer (3.64.0):
+  - BitmovinPlayer (3.66.1):
     - BitmovinAnalyticsCollector/BitmovinPlayer (~> 3.0)
-    - BitmovinPlayerCore (= 3.64.0)
-  - BitmovinPlayerCore (3.64.0)
+    - BitmovinPlayerCore (= 3.66.1)
+  - BitmovinPlayerCore (3.66.1)
   - boost (1.83.0)
   - ConvivaSDK (4.0.49)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.74.1-0)
   - fmt (9.1.0)
   - glog (0.3.5)
-  - GoogleAds-IMA-iOS-SDK (3.19.1)
-  - GoogleAds-IMA-tvOS-SDK (4.9.2)
+  - GoogleAds-IMA-iOS-SDK (3.23.0)
+  - GoogleAds-IMA-tvOS-SDK (4.13.0)
   - hermes-engine (0.74.1-0):
     - hermes-engine/Pre-built (= 0.74.1-0)
   - hermes-engine/Pre-built (0.74.1-0)
@@ -1176,10 +1176,10 @@ PODS:
     - React-logger (= 0.74.1-0)
     - React-perflogger (= 0.74.1-0)
     - React-utils (= 0.74.1-0)
-  - RNBitmovinPlayer (0.25.0):
-    - BitmovinPlayer (= 3.64.0)
-    - GoogleAds-IMA-iOS-SDK (= 3.19.1)
-    - GoogleAds-IMA-tvOS-SDK (= 4.9.2)
+  - RNBitmovinPlayer (0.27.1):
+    - BitmovinPlayer (= 3.66.1)
+    - GoogleAds-IMA-iOS-SDK (= 3.23.0)
+    - GoogleAds-IMA-tvOS-SDK (= 4.13.0)
     - React-Core
   - SocketRocket (0.7.0)
   - Yoga (0.0.0)
@@ -1380,16 +1380,16 @@ SPEC CHECKSUMS:
   bitmovin-player-react-native-analytics-conviva: 19dc365ec0d653e864ceeb68698b8d541c4e0bce
   BitmovinAnalyticsCollector: bbd82c0b8e11aefacd8e53b6e40c62f2cba6f3f5
   BitmovinConvivaAnalytics: f7078baeee0fd5d95afd936dfb4e2d8b35b6a27d
-  BitmovinPlayer: f69350e5db2f57ad950108ec829b7c7a4b360d00
-  BitmovinPlayerCore: 1553570729eed0a64cdfbd06d16c39d69d7e701f
+  BitmovinPlayer: 0d5990c196eff314b7081c49ed481e9d465d7281
+  BitmovinPlayerCore: f6f8b8655bece7c8e9daccc49cc55642212d9c2f
   boost: 88202336c3ba1e7a264a83c0c888784b0f360c28
   ConvivaSDK: 5d10811e8611ed1fd99a5ab291bdcb1e795f8756
   DoubleConversion: 00143ab27d470b28035933623e1a3ea37e68889c
   FBLazyVector: f13c7f203117288def36bfc9a195216ff4fea859
   fmt: 1568fa7b2f242362c45c42d4a15e9dd4b2e621b3
   glog: f0ddebfc00a905e9213e37801095a0a705d2e5f6
-  GoogleAds-IMA-iOS-SDK: 18adbec04a2e79ce828a992d37a4580deadbe525
-  GoogleAds-IMA-tvOS-SDK: 7e72fb938c246fb9718a3468d3c7fa7c722b2ea1
+  GoogleAds-IMA-iOS-SDK: ee2a68ed7a1a17c7bb81bdb1b81590b35a3fc8f3
+  GoogleAds-IMA-tvOS-SDK: 9f79f4adcccd2393a93b00f62f566a69175f3978
   hermes-engine: 075dd41a8f260f99d7c5c77ad79b0b9632ee920d
   RCT-Folly: b54b39c7532acfa0216d988bdeb706883e71416e
   RCTDeprecation: a6e6151fa6cb426065ec2997b746fe76e079db8d
@@ -1437,7 +1437,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 4780cdba710de22aae5ea6769266cec9a89b2bba
   React-utils: 45e9ba5a0ec387d31de5d24043bdcf7915b9658b
   ReactCommon: 678c6fdb479e7533859f29000d899af37d3a6c7a
-  RNBitmovinPlayer: f2c78273cbb5de5b98609b6ed624fd8aa9a0da07
+  RNBitmovinPlayer: 57b3b5672e59031080ce43928f3c1f2275eaec00
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: bb33480fd76c5cb82ef4ba27c49276abfdd692d1
 
