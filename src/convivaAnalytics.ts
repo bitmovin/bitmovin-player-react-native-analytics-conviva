@@ -17,8 +17,9 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
 
   /**
    * Namespace for reporting server-side ad breaks and ads.
+   * See {@link SsaiApi} for more information.
    */
-  readonly ssai = new SsaiApi(this.nativeId);
+  readonly ssai: SsaiApi = new SsaiApi(this.nativeId);
 
   /**
    * Initializes the conviva analytics.
