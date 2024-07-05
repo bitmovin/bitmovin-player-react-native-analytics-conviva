@@ -1,6 +1,5 @@
 import BitmovinConvivaAnalytics
 import BitmovinPlayerCore
-import ConvivaSDK
 import React
 import RNBitmovinPlayer
 
