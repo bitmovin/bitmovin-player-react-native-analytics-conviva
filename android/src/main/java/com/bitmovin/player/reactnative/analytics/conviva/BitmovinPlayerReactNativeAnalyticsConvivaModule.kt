@@ -8,7 +8,9 @@ import com.bitmovin.player.reactnative.analytics.conviva.converter.toMetadataOve
 import com.bitmovin.player.reactnative.extensions.playerModule
 import com.bitmovin.player.reactnative.extensions.toMap
 import com.facebook.react.bridge.*
+import com.facebook.react.module.annotations.ReactModule
 
+@ReactModule(name = BitmovinPlayerReactNativeAnalyticsConvivaModule.NAME)
 class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationContext) :
     BitmovinBaseModule(context) {
 
