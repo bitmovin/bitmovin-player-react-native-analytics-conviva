@@ -97,7 +97,9 @@ export class SsaiApi {
    * @platform Android, iOS, tvOS
    */
   reportAdBreakFinished = async (): Promise<void> => {
-    return BitmovinPlayerReactNativeAnalyticsConvivaSsai.reportAdBreakFinished();
+    return BitmovinPlayerReactNativeAnalyticsConvivaSsai.reportAdBreakFinished(
+      this.nativeId
+    );
   };
 
   /**
