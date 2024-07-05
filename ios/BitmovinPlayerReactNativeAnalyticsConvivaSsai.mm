@@ -1,7 +1,7 @@
 #import <React/RCTBridgeModule.h>
 
 @interface RCT_EXTERN_REMAP_MODULE(BitmovinPlayerReactNativeAnalyticsConvivaSsai, BitmovinPlayerReactNativeAnalyticsConvivaSsai, NSObject)
-RCT_EXTERN_METHOD(isAdbreakActive:(NSString *)nativeId
+RCT_EXTERN_METHOD(isAdBreakActive:(NSString *)nativeId
                          resolver:(RCTPromiseResolveBlock)resolve
                          rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(reportAdBreakStarted:(NSString *)nativeId

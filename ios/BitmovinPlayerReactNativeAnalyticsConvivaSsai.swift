@@ -91,7 +91,7 @@ public class BitmovinPlayerReactNativeAnalyticsConvivaSsai: NSObject, RCTBridgeM
         resolve(nil)
     }
 
-    @objc(reportAdEnded:resolver:rejecter:)
+    @objc(reportAdFinished:resolver:rejecter:)
     func reportAdFinished(
         _ nativeId: NativeId,
         resolver resolve: @escaping RCTPromiseResolveBlock,
