@@ -1,6 +1,9 @@
 package com.bitmovin.player.reactnative.analytics.conviva.converter
 
 import com.bitmovin.analytics.conviva.MetadataOverrides
+import com.bitmovin.analytics.conviva.ssai.AdPosition
+import com.bitmovin.analytics.conviva.ssai.SsaiApi
+import com.bitmovin.player.reactnative.extensions.getDoubleOrNull
 import com.bitmovin.player.reactnative.extensions.getIntOrNull
 import com.bitmovin.player.reactnative.extensions.toMap
 import com.conviva.sdk.ConvivaSdkConstants
@@ -30,5 +33,25 @@ private fun String?.toStreamType(): ConvivaSdkConstants.StreamType? = when (this
 fun String?.toErrorSeverity(): ConvivaSdkConstants.ErrorSeverity? = when (this) {
     "FATAL" -> ConvivaSdkConstants.ErrorSeverity.FATAL
     "WARNING" -> ConvivaSdkConstants.ErrorSeverity.WARNING
+    else -> null
+}
+
+fun ReadableMap.toSsaiAdInfo(): SsaiApi.AdInfo = SsaiApi.AdInfo().apply {
+    title = getString("title")
+    getDoubleOrNull("duration")?.let { duration = it }
+    id = getString("id")
+    adSystem = getString("adSystem")
+    getString("position")?.toAdPosition().let {
+        position = it
+    }
+    isSlate = getBoolean("isSlate")
+    adStitcher = getString("adStitcher")
+    additionalMetadata = getMap("additionalMetadata")?.toMap()
+}
+
+private fun String?.toAdPosition(): AdPosition? = when (this) {
+    "preroll" -> AdPosition.PREROLL
+    "midroll" -> AdPosition.MIDROLL
+    "postroll" -> AdPosition.POSTROLL
     else -> null
 }
