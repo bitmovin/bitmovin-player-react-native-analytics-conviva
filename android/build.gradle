@@ -103,7 +103,7 @@ dependencies {
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation 'com.conviva.sdk:conviva-core-sdk:4.0.37'
-  implementation 'com.bitmovin.analytics:conviva:2.4.0'
+  implementation 'com.bitmovin.analytics:conviva:2.5.0'
   implementation project(':bitmovin-player-react-native')
-  implementation 'com.bitmovin.player:player:+'
+  implementation 'com.bitmovin.player:player:3.74.0+jason' // must be the same version as in bitmovin-player-react-native
 }

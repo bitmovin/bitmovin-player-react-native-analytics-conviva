@@ -8,7 +8,9 @@ import com.bitmovin.player.reactnative.analytics.conviva.converter.toMetadataOve
 import com.bitmovin.player.reactnative.extensions.playerModule
 import com.bitmovin.player.reactnative.extensions.toMap
 import com.facebook.react.bridge.*
+import com.facebook.react.module.annotations.ReactModule
 
+@ReactModule(name = BitmovinPlayerReactNativeAnalyticsConvivaModule.NAME)
 class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationContext) :
     BitmovinBaseModule(context) {
 
@@ -135,24 +137,7 @@ class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationC
         }
     }
 
-    private inline fun <T> TPromise<T>.resolveOnUiThreadWithConvivaAnalytics(
-        nativeId: NativeId,
-        crossinline block: ConvivaAnalyticsIntegration.() -> T,
-    ) = resolveOnUiThread {
-        getConvivaAnalytics(nativeId, this@BitmovinPlayerReactNativeAnalyticsConvivaModule).block()
-    }
-
-    private fun RejectPromiseOnExceptionBlock.getConvivaAnalytics(
-        nativeId: NativeId,
-        convivaModule: BitmovinPlayerReactNativeAnalyticsConvivaModule =
-            this@BitmovinPlayerReactNativeAnalyticsConvivaModule,
-    ): ConvivaAnalyticsIntegration {
-        return convivaModule.getConvivaAnalyticsOrNull(nativeId) ?: throw IllegalArgumentException(
-            "Invalid BitmovinPlayerReactNativeAnalyticsConviva $nativeId",
-        )
-    }
-
-    private fun getConvivaAnalyticsOrNull(nativeId: NativeId): ConvivaAnalyticsIntegration? {
+    internal fun getConvivaAnalyticsOrNull(nativeId: NativeId): ConvivaAnalyticsIntegration? {
         return convivaAnalyticsInstances[nativeId]
     }
 

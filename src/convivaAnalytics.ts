@@ -3,6 +3,7 @@ import type { ConvivaErrorSeverity } from './convivaErrorSeverity';
 import { Platform, NativeModules, findNodeHandle } from 'react-native';
 import NativeInstance from './nativeInstance';
 import type { ConvivaAnalyticsConfig } from './convivaAnalyticsConfig';
+import { SsaiApi } from './ssaiApi';
 
 const { BitmovinPlayerReactNativeAnalyticsConviva } = NativeModules;
 
@@ -13,6 +14,12 @@ const { BitmovinPlayerReactNativeAnalyticsConviva } = NativeModules;
 export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
   isInitialized = false;
   isDestroyed = false;
+
+  /**
+   * Namespace for reporting server-side ad breaks and ads.
+   * See {@link SsaiApi} for more information.
+   */
+  readonly ssai: SsaiApi = new SsaiApi(this.nativeId);
 
   /**
    * Initializes the conviva analytics.

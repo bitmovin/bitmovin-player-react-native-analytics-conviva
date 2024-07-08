@@ -56,7 +56,7 @@ source 'https://github.com/bitmovin/cocoapod-specs.git'
 The the following line to your desired target:
 
 ```ruby
-pod 'BitmovinConvivaAnalytics', git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git', tag: '3.1.0'
+pod 'BitmovinConvivaAnalytics', git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git', tag: '3.3.0'
 ```
 
 Then, in your command line run in your `ios` folder:
@@ -115,6 +115,8 @@ const onConvivaSetupError = useCallback((error) => {
 convivaAnalytics.initialize().catch(onConvivaSetupError);
 ```
 
+### Cleanup
+
 At the end of the application's lifecycle, release the integration with:
 
 ```ts
@@ -141,6 +143,41 @@ convivaAnalytics.updateContentMetadata(metadata);
 ```
 
 Those values will be cleaned up after the session is closed.
+
+### Server Side Ad Tracking
+
+In order to track server side ads you can use the methods provided in `SsaiApi` which can be accessed via `ConvivaAnalytics.ssai`.
+The following example shows basic server side ad tracking:
+
+```ts
+convivaAnalytics.ssai.reportAdBreakStarted()
+
+const adInfo: SsaiAdInfo = {
+    title: "My ad title",
+    position: SsaiAdPosition.PREROLL,
+    duration: 30,
+}
+convivaAnalytics.ssai.reportAdStarted(adInfo)
+
+...
+
+convivaAnalytics.ssai.reportAdFinished()
+convivaAnalytics.ssai.reportAdBreakFinished()
+```
+
+In addition to the metadata provided in the `SsaiAdInfo` object at ad start, the following metadata will be auto collected from the main content metadata:
+
+- Stream URL
+- Asset Name
+- Is live flag
+- Default resource
+- encoded frame rate
+- streamType
+- integrationVersion
+- viewer ID
+- player name
+
+Metadata in the `SsaiAdInfo` overwrites all auto collected metadata.
 
 ### Background handling
 
