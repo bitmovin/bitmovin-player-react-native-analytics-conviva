@@ -64,7 +64,16 @@ jobs:
           node: true
           subprojects: true
           ios: true
-          restore-pods: true
+
+      - name: Restore Pods cache
+        id: pods-cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            .cocoapods-cache
+            example/ios/Pods
+          key: pods-${{ hashFiles('example/ios/Podfile.lock') }}
+          restore-keys: pods-
 
       - name: Install pods
         run: |
@@ -101,7 +110,16 @@ jobs:
           node: true
           subprojects: true
           ios: true
-          restore-pods: true
+
+      - name: Restore Pods cache
+        id: pods-cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            .cocoapods-cache
+            example/ios/Pods
+          key: pods-${{ hashFiles('example/ios/Podfile.lock') }}
+          restore-keys: pods-
 
       - name: Install pods
         run: |
