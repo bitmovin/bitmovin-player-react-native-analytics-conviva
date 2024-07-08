@@ -6,6 +6,10 @@
 
 - `ConvivaAnalytics.ssai` namespace to enable server side ad tracking
 
+### Changed
+
+- Updated the `bitmovin-player-react-native` dependency to `0.27.1`.
+
 ## [1.0.0] - 2024-06-14
 
 Adds support for Conviva Analytics with Bitmovin Player React Native SDK.
