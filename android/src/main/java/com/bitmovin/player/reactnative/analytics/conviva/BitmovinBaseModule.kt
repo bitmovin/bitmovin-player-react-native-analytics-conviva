@@ -1,6 +1,8 @@
 package com.bitmovin.player.reactnative.analytics.conviva
 
 import android.util.Log
+import com.bitmovin.analytics.conviva.ConvivaAnalyticsIntegration
+import com.bitmovin.player.reactnative.analytics.conviva.extensions.convivaModule
 import com.bitmovin.player.reactnative.analytics.conviva.extensions.uiManagerModule
 import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.UIManagerModule
@@ -34,6 +36,26 @@ abstract class BitmovinBaseModule(
     }
     protected val RejectPromiseOnExceptionBlock.uiManager: UIManagerModule get() = context.uiManagerModule
         ?: throw IllegalStateException("UIManager not found")
+
+    protected val RejectPromiseOnExceptionBlock.convivaModule: BitmovinPlayerReactNativeAnalyticsConvivaModule
+        get() = context.convivaModule
+            ?: throw IllegalStateException("UIManager not found")
+
+    protected inline fun <T> TPromise<T>.resolveOnUiThreadWithConvivaAnalytics(
+        nativeId: NativeId,
+        crossinline block: ConvivaAnalyticsIntegration.() -> T,
+    ) = resolveOnUiThread {
+        getConvivaAnalytics(nativeId, convivaModule).block()
+    }
+
+    fun RejectPromiseOnExceptionBlock.getConvivaAnalytics(
+        nativeId: NativeId,
+        convivaModule: BitmovinPlayerReactNativeAnalyticsConvivaModule = this.convivaModule,
+    ): ConvivaAnalyticsIntegration {
+        return convivaModule.getConvivaAnalyticsOrNull(nativeId) ?: throw IllegalArgumentException(
+            "Invalid BitmovinPlayerReactNativeAnalyticsConviva $nativeId",
+        )
+    }
 }
 
 /** Run [block], returning it's return value. If [block] throws, [Promise.reject] [this] and return null. */
