@@ -27,7 +27,7 @@ extension RCTConvert {
         metadataOverrides.encodedFramerate = (json["encodedFramerate"] as? NSNumber)?.intValue
         metadataOverrides.defaultResource = json["defaultResource"] as? String
         metadataOverrides.streamUrl = json["streamUrl"] as? String
-        metadataOverrides.imaSdkVersion = json["imaSdkVersion"] as? String
+        metadataOverrides.imaSdkVerison = json["imaSdkVersion"] as? String
         return metadataOverrides
     }
 
