@@ -149,7 +149,7 @@ Those values will be cleaned up after the session is closed.
 In order to track server side ads you can use the methods provided in `SsaiApi` which can be accessed via `ConvivaAnalytics.ssai`.
 The following example shows basic server side ad tracking:
 
-```swift
+```ts
 convivaAnalytics.ssai.reportAdBreakStarted()
 
 const adInfo: SsaiAdInfo = {
