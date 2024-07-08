@@ -170,7 +170,7 @@ In addition to the metadata provided in the `SsaiAdInfo` object at ad start, the
 - Stream URL
 - Asset Name
 - Is live flag
-- Defautl resource
+- Default resource
 - encoded frame rate
 - streamType
 - integrationVersion
