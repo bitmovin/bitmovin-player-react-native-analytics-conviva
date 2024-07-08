@@ -17,7 +17,7 @@ export interface ConvivaMetadataOverrides {
   /**
    * Standard Conviva tags that aren't covered by the other fields in this class.
    * List of tags can be found here:
-   * [Pre-defined Video and Content Metadata](https://pulse.conviva.com/learning-center/content/sensor_developer_center/sensor_integration/ios/ios_stream_sensor.html#Predefined_video_meta)
+   * [Pre-defined Video and Content Metadata](https://pulse.conviva.com/learning-center/content/sensor_developer_center/sensor_integration/javascript/javascript_stream_sensor.htm#Predefined_video_meta)
    */
   additionalStandardTags?: { [key: string]: any };
 
