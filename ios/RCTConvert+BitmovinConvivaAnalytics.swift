@@ -43,4 +43,30 @@ extension RCTConvert {
             return nil
         }
     }
+
+    static func adInfo(_ json: [String: Any]) -> SsaiAdInfo {
+        SsaiAdInfo(
+            title: json["title"] as? String,
+            duration: json["duration"] as? Double,
+            id: json["id"] as? String,
+            adSystem: json["adSystem"] as? String,
+            position: RCTConvert.adPosition(json["position"] as? String),
+            isSlate: json["isSlate"] as? Bool ?? false,
+            adStitcher: json["adStitcher"] as? String,
+            additionalMetadata: json["additionalMetadata"] as? [String: Any]
+        )
+    }
+
+    static func adPosition(_ json: String?) -> SsaiAdPosition? {
+        switch json {
+        case "preroll":
+            return .preroll
+        case "midroll":
+            return .midroll
+        case "postroll":
+            return .postroll
+        default:
+            return nil
+        }
+    }
 }
