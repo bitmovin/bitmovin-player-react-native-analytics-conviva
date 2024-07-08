@@ -52,7 +52,7 @@ public class BitmovinPlayerReactNativeAnalyticsConvivaSsai: NSObject, RCTBridgeM
         resolve(nil)
     }
 
-    @objc(reportAdBreakEnded:resolver:rejecter:)
+    @objc(reportAdBreakFinished:resolver:rejecter:)
     func reportAdBreakFinished(
         _ nativeId: NativeId,
         resolver resolve: @escaping RCTPromiseResolveBlock,
