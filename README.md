@@ -56,7 +56,7 @@ source 'https://github.com/bitmovin/cocoapod-specs.git'
 The the following line to your desired target:
 
 ```ruby
-pod 'BitmovinConvivaAnalytics', git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git', tag: '3.3.0'
+pod 'BitmovinConvivaAnalytics', git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git', tag: '3.3.2'
 ```
 
 Then, in your command line run in your `ios` folder:

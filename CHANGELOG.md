@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Updated the Bitmovin Player Conviva Analytics Integration for iOS dependency to `3.3.2`.
+
 ## [1.1.0] - 2024-07-08
 
 ### Added
