@@ -4,6 +4,7 @@ import { Platform, NativeModules, findNodeHandle } from 'react-native';
 import NativeInstance from './nativeInstance';
 import type { ConvivaAnalyticsConfig } from './convivaAnalyticsConfig';
 import { SsaiApi } from './ssaiApi';
+import type { Player } from 'bitmovin-player-react-native';
 
 const { BitmovinPlayerReactNativeAnalyticsConviva } = NativeModules;
 
@@ -34,7 +35,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     this.isInitialized = true;
     return BitmovinPlayerReactNativeAnalyticsConviva.initWithConfig(
       this.nativeId,
-      this.config?.player.nativeId,
+      this.config?.player?.nativeId,
       this.config?.customerKey,
       this.config?.gatewayUrl,
       this.config?.debugLoggingEnabled ?? false
@@ -42,14 +43,53 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
   };
 
   /**
+   * Initializes a new conviva tracking session.
+   *
+   *  @warning The integration can only be validated without external session managing. So when using this method we can
+   *  no longer ensure that the session is managed at the correct time. Additional: Since some metadata attributes
+   *  rely on the player's source we can't ensure that all metadata attributes are present at session creation.
+   *  Therefore it is possible that we receive a 'ContentMetadata created late' issue after conviva validation.
+   *
+   *  If no source was loaded (or the itemTitle is missing) and no assetName was set via updateContentMetadata
+   *  this method will throw an error.
+   *
+   * @returns promise which resolves when the conviva tracking session is sucessfully initialized.
+   *
+   * @platform Android, iOS, tvOS
+   */
+  initializeSession = async (): Promise<void> => {
+    return BitmovinPlayerReactNativeAnalyticsConviva.initializeSession(
+      this.nativeId
+    );
+  };
+
+  /**
+   * Attaches the given player to the conviva analytics.
+   * This method should be called as soon as the `Player` instance is initialized to not miss any tracking.
+   *
+   * @warning Has no effect if there is already a {@link Player} instance set. Use the {@link ConvivaAnalyticsConfig} without `player` if you plan to attach a `Player` instance later in the life-cycle.
+   *
+   * @param player The player which should be attached to the conviva analytics.
+   * @returns promise which resolves when the player is sucessfully attached to the conviva analytics.
+   *
+   * @platform Android, iOS, tvOS
+   */
+  attachPlayer = async (player: Player): Promise<void> => {
+    return BitmovinPlayerReactNativeAnalyticsConviva.attachPlayer(
+      this.nativeId,
+      player.nativeId
+    );
+  };
+
+  /**
    * Destroys the native `ConvivaAnalytics` and releases all of its allocated resources.
    */
-  destroy(): void {
+  destroy = () => {
     if (!this.isDestroyed) {
       BitmovinPlayerReactNativeAnalyticsConviva.destroy(this.nativeId);
       this.isDestroyed = true;
     }
-  }
+  };
 
   /**
    * Releases the conviva analytics.

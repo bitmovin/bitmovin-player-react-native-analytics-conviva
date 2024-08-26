@@ -28,7 +28,7 @@ def setup os
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod "BitmovinConvivaAnalytics", git: "https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git", tag: "3.3.2"
+  pod "BitmovinConvivaAnalytics", git: "https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git", tag: "3.4.0"
 end
 
 target 'BitmovinPlayerReactNativeAnalyticsConvivaExample' do

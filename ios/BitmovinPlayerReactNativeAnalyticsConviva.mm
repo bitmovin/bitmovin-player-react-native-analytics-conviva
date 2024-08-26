@@ -8,8 +8,15 @@ RCT_EXTERN_METHOD(initWithConfig:(NSString *)nativeId
              debugLoggingEnabled:(BOOL)debugLoggingEnabled
                         resolver:(RCTPromiseResolveBlock)resolve
                         rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(attachPlayer:(NSString *)nativeId
+                  playerNativeId:(NSString *)playerNativeId
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(destroy:(NSString *)nativeId)
 RCT_EXTERN_METHOD(release:(NSString *)nativeId)
+RCT_EXTERN_METHOD(initializeSession:(NSString *)nativeId
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(endSession:(NSString *)nativeId)
 RCT_EXTERN_METHOD(setPlayerViewRef:(NSString *)nativeId playerViewRefId:(nonnull NSNumber *)playerViewRefId)
 RCT_EXTERN_METHOD(resetPlayerViewRef:(NSString *)nativeId)

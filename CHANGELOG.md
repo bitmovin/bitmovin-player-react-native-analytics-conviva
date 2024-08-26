@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Possibility to start session tracking without a `Player` instance
+  - `ConvivaAnalytics({ customerKey, config })` without a `Player`
+  - `ConvivaAnalytics.attachPlayer(player)` to attach the `Player` at a later point in the session life-cycle
+
+### Changed
+
+- Updated the `bitmovin-player-react-native` dependency to `0.28.0`.
+- Updated the Bitmovin Player Conviva Analytics Integration for iOS dependency to `3.4.0`.
+
 ## [1.2.0] - 2024-07-26
 
 ### Changed

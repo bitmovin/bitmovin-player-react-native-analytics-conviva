@@ -26,13 +26,13 @@ PODS:
     - BitmovinAnalyticsCollector/Core
     - BitmovinPlayerCore (~> 3.48)
   - BitmovinAnalyticsCollector/Core (3.7.0)
-  - BitmovinConvivaAnalytics (3.3.2):
+  - BitmovinConvivaAnalytics (3.4.0):
     - BitmovinPlayer (~> 3.64)
     - ConvivaSDK (~> 4.0)
-  - BitmovinPlayer (3.66.1):
+  - BitmovinPlayer (3.67.0):
     - BitmovinAnalyticsCollector/BitmovinPlayer (~> 3.0)
-    - BitmovinPlayerCore (= 3.66.1)
-  - BitmovinPlayerCore (3.66.1)
+    - BitmovinPlayerCore (= 3.67.0)
+  - BitmovinPlayerCore (3.67.0)
   - boost (1.83.0)
   - ConvivaSDK (4.0.49)
   - DoubleConversion (1.1.6)
@@ -1176,8 +1176,8 @@ PODS:
     - React-logger (= 0.74.1-0)
     - React-perflogger (= 0.74.1-0)
     - React-utils (= 0.74.1-0)
-  - RNBitmovinPlayer (0.27.1):
-    - BitmovinPlayer (= 3.66.1)
+  - RNBitmovinPlayer (0.28.0):
+    - BitmovinPlayer (= 3.67.0)
     - GoogleAds-IMA-iOS-SDK (= 3.23.0)
     - GoogleAds-IMA-tvOS-SDK (= 4.13.0)
     - React-Core
@@ -1186,7 +1186,7 @@ PODS:
 
 DEPENDENCIES:
   - bitmovin-player-react-native-analytics-conviva (from `../..`)
-  - BitmovinConvivaAnalytics (from `https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git`, tag `3.3.2`)
+  - BitmovinConvivaAnalytics (from `https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git`, tag `3.4.0`)
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -1260,7 +1260,7 @@ EXTERNAL SOURCES:
     :path: "../.."
   BitmovinConvivaAnalytics:
     :git: https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git
-    :tag: 3.3.2
+    :tag: 3.4.0
   boost:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
@@ -1374,14 +1374,14 @@ EXTERNAL SOURCES:
 CHECKOUT OPTIONS:
   BitmovinConvivaAnalytics:
     :git: https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git
-    :tag: 3.3.2
+    :tag: 3.4.0
 
 SPEC CHECKSUMS:
   bitmovin-player-react-native-analytics-conviva: 09fb79f45e2294ce339c7d0ee03b00a187a03075
   BitmovinAnalyticsCollector: bbd82c0b8e11aefacd8e53b6e40c62f2cba6f3f5
-  BitmovinConvivaAnalytics: efb80945c4f01c977b12b6ff5b2d4a1168fd132d
-  BitmovinPlayer: 0d5990c196eff314b7081c49ed481e9d465d7281
-  BitmovinPlayerCore: f6f8b8655bece7c8e9daccc49cc55642212d9c2f
+  BitmovinConvivaAnalytics: fdb459a33e7151d8fc26c736d16f7efb52aad5a5
+  BitmovinPlayer: 48ee17de9e0bbd310d874112bab92cb78f5e1cbf
+  BitmovinPlayerCore: da464f49a91a1308519a7187088822e33f1d057b
   boost: 88202336c3ba1e7a264a83c0c888784b0f360c28
   ConvivaSDK: 5d10811e8611ed1fd99a5ab291bdcb1e795f8756
   DoubleConversion: 00143ab27d470b28035933623e1a3ea37e68889c
@@ -1437,10 +1437,10 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 4780cdba710de22aae5ea6769266cec9a89b2bba
   React-utils: 45e9ba5a0ec387d31de5d24043bdcf7915b9658b
   ReactCommon: 678c6fdb479e7533859f29000d899af37d3a6c7a
-  RNBitmovinPlayer: 57b3b5672e59031080ce43928f3c1f2275eaec00
+  RNBitmovinPlayer: ae4f785479c566a71bf03d84bde7ec139eb22eaa
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: d84d1e521e3f8fa3cdd139d617ddf6514d061c78
+  Yoga: bb33480fd76c5cb82ef4ba27c49276abfdd692d1
 
-PODFILE CHECKSUM: afac6349ff0a4b82bbc00d809d7b699ce74cd4a7
+PODFILE CHECKSUM: 4e5689986b30951dcf432aef14ca8e81c3a4202a
 
 COCOAPODS: 1.15.2
