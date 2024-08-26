@@ -33,13 +33,13 @@ Thank you for your contributions!
 To install it in your project, simply run:
 
 ```sh
-npm install bitmovin-player-react-native-analytics-conviva
+npm install bitmovin-player-react-native-analytics-conviva bitmovin-player-react-native --save
 ```
 
 or with yarn:
 
 ```sh
-yarn add bitmovin-player-react-native-analytics-conviva
+yarn add bitmovin-player-react-native-analytics-conviva bitmovin-player-react-native
 ```
 
 Additionally to install the native dependencies, follow the next steps:

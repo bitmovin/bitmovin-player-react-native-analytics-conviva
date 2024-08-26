@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Dependency on `bitmovin-player-react-native` has to be explicitly added to the project to avoid conflicts with other versions.
+
 ## [1.2.0] - 2024-07-26
 
 ### Changed

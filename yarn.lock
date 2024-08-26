@@ -3672,7 +3672,7 @@ __metadata:
     "@react-native/typescript-config": 0.74.83
     "@types/validator": ^13.11.10
     babel-plugin-module-resolver: ^5.0.0
-    bitmovin-player-react-native: ^0.27.1
+    bitmovin-player-react-native: 0.28.0
     pod-install: ^0.1.0
     react: 18.2.0
     react-native: "npm:react-native-tvos@0.74.1-0"
@@ -3687,7 +3687,6 @@ __metadata:
     "@react-native/eslint-config": ^0.73.1
     "@types/jest": ^29.5.5
     "@types/react": ^18.2.44
-    bitmovin-player-react-native: 0.27.1
     del-cli: ^5.1.0
     eslint: ^8.51.0
     eslint-config-prettier: ^9.0.0
@@ -3707,15 +3706,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"bitmovin-player-react-native@npm:0.27.1, bitmovin-player-react-native@npm:^0.27.1":
-  version: 0.27.1
-  resolution: "bitmovin-player-react-native@npm:0.27.1"
+"bitmovin-player-react-native@npm:0.28.0":
+  version: 0.28.0
+  resolution: "bitmovin-player-react-native@npm:0.28.0"
   dependencies:
     lodash.omit: 4.5.0
   peerDependencies:
     react: ">=17"
     react-native: ">=0.65"
-  checksum: 9721578d739e0cadcd3bdd3a6833e0a988d824c954d746f39ef7c2afd679d793960d848f5e834e8b3ee31772a85a0b9b1cb08e5368c7eb43e2a61f97e9990127
+  checksum: 2ff27f161621e78aecaad8dd53ffa51e9152d1ef282d58103eda3d648eba773bb79351c0b4d4b14afd5f995d142666b59f2397cc4dc410badf79ff9f4e36bfeb
   languageName: node
   linkType: hard
 
