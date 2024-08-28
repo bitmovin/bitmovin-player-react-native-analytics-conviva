@@ -271,7 +271,7 @@ export default function App() {
               assetUrlRef.current = text;
             }}
           />
-          <View style={styles.buttonContainer}>
+          <View style={styles.buttonRowContainer}>
             <Button
               title="Setup"
               onPress={() => {
@@ -280,12 +280,16 @@ export default function App() {
             />
             <Button title="Release" onPress={release} />
           </View>
-          <View style={styles.buttonContainer}>
+          <View style={styles.buttonRowContainer}>
             <Button title="Pause tracking" onPress={pauseTracking} />
             <Button title="Resume Tracking" onPress={resumeTracking} />
           </View>
-          <Button title="Send custom event" onPress={sendCustomEvent} />
-          <Button title="Start session" onPress={startSession} />
+          <View style={styles.buttonContainer}>
+            <Button title="Send custom event" onPress={sendCustomEvent} />
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button title="Start session" onPress={startSession} />
+          </View>
         </>
       )}
     </Container>
@@ -320,8 +324,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 8,
   },
-  buttonContainer: {
+  buttonRowContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 16,
+  },
+  buttonContainer: {
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 16,
