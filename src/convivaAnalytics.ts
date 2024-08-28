@@ -45,13 +45,13 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
   /**
    * Initializes a new conviva tracking session.
    *
-   *  @warning The integration can only be validated without external session managing. So when using this method we can
-   *  no longer ensure that the session is managed at the correct time. Additional: Since some metadata attributes
-   *  rely on the player's source we can't ensure that all metadata attributes are present at session creation.
-   *  Therefore it is possible that we receive a 'ContentMetadata created late' issue after conviva validation.
+   * @warning The integration can only be validated without external session managing. So when using this method we can
+   * no longer ensure that the session is managed at the correct time. Additional: Since some metadata attributes
+   * rely on the player's source we can't ensure that all metadata attributes are present at session creation.
+   * Therefore it is possible that we receive a 'ContentMetadata created late' issue after conviva validation.
    *
-   *  If no source was loaded (or the itemTitle is missing) and no assetName was set via updateContentMetadata
-   *  this method will throw an error.
+   * If no source was loaded (or the itemTitle is missing) and no assetName was set via updateContentMetadata
+   * this method will throw an error.
    *
    * @returns promise which resolves when the conviva tracking session is sucessfully initialized.
    *
