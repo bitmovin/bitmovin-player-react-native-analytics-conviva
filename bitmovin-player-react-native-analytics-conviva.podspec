@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
     :git => "https://github.com/bitmovin/bitmovin-player-react-native-analytics-conviva.git",
     :tag => "#{s.version}"
   }
-  s.dependency "BitmovinConvivaAnalytics" # 3.3.2 or newer
+  s.dependency "BitmovinConvivaAnalytics" # 3.4.1 or newer
   s.dependency "RNBitmovinPlayer"
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
