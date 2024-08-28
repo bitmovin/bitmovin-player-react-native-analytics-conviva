@@ -1,6 +1,5 @@
 package com.bitmovin.player.reactnative.analytics.conviva
 
-import android.util.Log
 import com.bitmovin.analytics.conviva.ConvivaAnalyticsIntegration
 import com.bitmovin.analytics.conviva.ConvivaConfig
 import com.bitmovin.player.reactnative.analytics.conviva.converter.toErrorSeverity
@@ -23,17 +22,20 @@ class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationC
     @ReactMethod
     fun initWithConfig(
         nativeId: NativeId,
-        playerNativeId: NativeId,
+        playerNativeId: NativeId?,
         customerKey: String,
         gatewayUrl: String?,
         debugLoggingEnabled: Boolean,
         promise: Promise,
     ) {
         promise.unit.resolveOnUiThread {
-            val player = context.playerModule?.getPlayerOrNull(playerNativeId)
-            if (player === null) {
-                promise.reject(NAME, "Could not retrieve Player with native Id $playerNativeId)")
-                return@resolveOnUiThread
+            val player = playerNativeId?.let { id ->
+                context.playerModule?.getPlayerOrNull(id).also { playerById ->
+                    if (playerById == null) {
+                        promise.reject(NAME, "Could not retrieve Player with native Id $playerNativeId")
+                        return@resolveOnUiThread
+                    }
+                }
             }
 
             val config = ConvivaConfig()
@@ -47,8 +49,28 @@ class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationC
             )
             convivaAnalyticsInstances[nativeId] = convivaAnalytics
 
-            Log.d("[dev]", "ConvivaAnalyticsIntegration initialized with nativeId: $nativeId")
+            promise.resolve(null)
+        }
+    }
 
+    @ReactMethod
+    fun attachPlayer(
+        nativeId: NativeId,
+        playerNativeId: NativeId,
+        promise: Promise,
+    ) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            val player = context.playerModule?.getPlayerOrNull(playerNativeId)
+            if (player == null) {
+                promise.reject(
+                    NAME,
+                    "Could not attach Player with native Id $playerNativeId to Conviva Analytics " +
+                        "with native Id $nativeId",
+                )
+                return@resolveOnUiThreadWithConvivaAnalytics
+            }
+
+            attachPlayer(player)
             promise.resolve(null)
         }
     }
@@ -65,6 +87,18 @@ class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationC
     fun release(nativeId: NativeId, promise: Promise) {
         promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
             release()
+        }
+    }
+
+    @ReactMethod
+    fun initializeSession(nativeId: NativeId, promise: Promise) {
+        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
+            try {
+                initializeSession()
+                promise.resolve(null)
+            } catch (e: Exception) {
+                promise.reject(NAME, "Could not initialize session for Conviva Analytics with native Id $nativeId", e)
+            }
         }
     }
 
