@@ -11,7 +11,7 @@
 ### Changed
 
 - Updated the `bitmovin-player-react-native` dependency to `0.28.0`.
-- Updated the Bitmovin Player Conviva Analytics Integration for iOS dependency to `3.4.0`.
+- Updated the Bitmovin Player Conviva Analytics Integration for iOS dependency to `3.4.1`.
 
 ## [1.2.0] - 2024-07-26
 
