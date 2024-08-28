@@ -31,7 +31,7 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
     @objc(initWithConfig:playerNativeId:customerKey:gatewayUrl:debugLoggingEnabled:resolver:rejecter:)
     func initWithConfig( // swiftlint:disable:this function_parameter_count
         _ nativeId: NativeId,
-        playerNativeId: NativeId,
+        playerNativeId: NativeId?,
         customerKey: String,
         gatewayUrl: String?,
         debugLoggingEnabled: Bool,
@@ -41,13 +41,19 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
         bridge.uiManager.addUIBlock { [weak self] _, _ in
             guard let self else { return }
 
-            guard let player = self.retrievePlayer(nativeId: playerNativeId) else {
-                reject(
-                    Self.moduleName(),
-                    "Could not retrieve Player with native Id \(playerNativeId)",
-                    nil
-                )
-                return
+            let player: Player?
+            if let playerNativeId {
+                guard let playerByNativeId = self.retrievePlayer(nativeId: playerNativeId) else {
+                    reject(
+                        Self.moduleName(),
+                        "Could not retrieve Player with native Id \(playerNativeId)",
+                        nil
+                    )
+                    return
+                }
+                player = playerByNativeId
+            } else {
+                player = nil
             }
             do {
                 let convivaConfig = ConvivaConfiguration()
@@ -55,11 +61,7 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
                     if let gatewayUrlValue = RCTConvert.nsurl(gatewayUrl) {
                         convivaConfig.gatewayUrl = gatewayUrlValue
                     } else {
-                        reject(
-                            Self.moduleName(),
-                            "Invalid gatewayUrl value \"\(gatewayUrl)\"",
-                            nil
-                        )
+                        reject(Self.moduleName(), "Invalid gatewayUrl value \"\(gatewayUrl)\"", nil)
                         return
                     }
                 }
@@ -77,10 +79,39 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
             } catch {
                 reject(
                     Self.moduleName(),
-                    "Could not initialize Conviva Analytics with native Id \(playerNativeId)",
+                    """
+                    Could not initialize Conviva Analytics with native Id \(nativeId) \
+                    using playerNativeId \(playerNativeId ?? "nil") and customerKey \(customerKey)
+                    """,
                     error
                 )
             }
+        }
+    }
+
+    @objc(attachPlayer:playerNativeId:resolver:rejecter:)
+    func attachPlayer(
+        _ nativeId: NativeId,
+        playerNativeId: NativeId,
+        resolver resolve: @escaping RCTPromiseResolveBlock,
+        rejecter reject: @escaping RCTPromiseRejectBlock
+    ) {
+        bridge.uiManager.addUIBlock { [weak self] _, _ in
+            guard let self,
+                  let conviva = self.retrieve(nativeId),
+                  let player = self.retrievePlayer(nativeId: playerNativeId) else {
+                reject(
+                    Self.moduleName(),
+                    """
+                    Could not attach Player with native Id \(playerNativeId) to \
+                    Conviva Analytics with native Id \(nativeId)
+                    """,
+                    nil
+                )
+                return
+            }
+            conviva.attach(player: player)
+            resolve(nil)
         }
     }
 
@@ -99,6 +130,28 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
             guard let self,
                   let conviva = self.retrieve(nativeId) else { return }
             conviva.release()
+        }
+    }
+
+    @objc(initializeSession:resolver:rejecter:)
+    func initializeSession(
+        _ nativeId: NativeId,
+        resolver resolve: @escaping RCTPromiseResolveBlock,
+        rejecter reject: @escaping RCTPromiseRejectBlock
+    ) {
+        bridge.uiManager.addUIBlock { [weak self] _, _ in
+            guard let self,
+                  let conviva = self.retrieve(nativeId) else { return }
+            do {
+                try conviva.initializeSession()
+                resolve(nil)
+            } catch {
+                reject(
+                    Self.moduleName(),
+                    "Could not initialize session for Conviva Analytics with native Id \(nativeId)",
+                    error
+                )
+            }
         }
     }
 
@@ -226,4 +279,25 @@ public class BitmovinPlayerReactNativeAnalyticsConviva: NSObject, RCTBridgeModul
 @objc
 private protocol PlayerModuleProtocol {
     func retrieve(_ nativeId: String) -> Player?
+}
+
+private extension ConvivaAnalytics {
+    convenience init(
+        player: Player?,
+        customerKey: String,
+        config: ConvivaConfiguration
+    ) throws {
+        if let player {
+            try self.init(
+                player: player,
+                customerKey: customerKey,
+                config: config
+            )
+        } else {
+            try self.init(
+                customerKey: customerKey,
+                config: config
+            )
+        }
+    }
 }

@@ -88,32 +88,55 @@ export default function App() {
     []
   );
 
-  const [player, setPlayer] = useState(createPlayer());
+  const [player, _setPlayer] = useState<Player | undefined>(createPlayer());
+  const setPlayer = useCallback(
+    (newPlayer: Player | undefined) => {
+      playerRef.current = newPlayer;
+      _setPlayer((prevPlayer) => {
+        prevPlayer?.destroy();
+        return newPlayer;
+      });
+    },
+    [_setPlayer]
+  );
+  const playerRef = useRef<Player | undefined>(player);
 
-  const createConvivaAnalytics = useCallback(async () => {
-    const convivaAnalytics = new ConvivaAnalytics({
-      player: player,
-      customerKey: CONVIVA_CUSTOMER_KEY,
-      debugLoggingEnabled: true,
-      gatewayUrl: CONVIVA_GATEWAY_URL,
-    });
-    await convivaAnalytics.initialize();
-    convivaAnalytics.updateContentMetadata({
-      applicationName: 'Bitmovin iOS Conviva integration example app',
-      viewerId: 'awesomeViewerId',
-      custom: { custom_tag: 'Episode' },
-      additionalStandardTags: { 'c3.cm.contentType': 'VOD' },
-    });
-    return convivaAnalytics;
-  }, [player]);
-
-  const [convivaAnalytics, setConvivaAnalytics] = useState<
+  const [convivaAnalytics, _setConvivaAnalytics] = useState<
     ConvivaAnalytics | undefined
   >(undefined);
+  const convivaAnalyticsRef = useRef<ConvivaAnalytics | undefined>(
+    convivaAnalytics
+  );
+  const setConvivaAnalytics = useCallback(
+    (newConvivaAnalytics: ConvivaAnalytics | undefined) => {
+      convivaAnalyticsRef.current = newConvivaAnalytics;
+      _setConvivaAnalytics(newConvivaAnalytics);
+    },
+    [_setConvivaAnalytics]
+  );
+
+  const createConvivaAnalytics =
+    useCallback(async (): Promise<ConvivaAnalytics> => {
+      if (convivaAnalyticsRef.current !== undefined) {
+        if (playerRef.current !== undefined) {
+          convivaAnalyticsRef.current.attachPlayer(playerRef.current as any);
+        }
+        return convivaAnalyticsRef.current;
+      } else {
+        const newConvivaAnalytics = new ConvivaAnalytics({
+          player: playerRef.current as any,
+          customerKey: CONVIVA_CUSTOMER_KEY,
+          debugLoggingEnabled: true,
+          gatewayUrl: CONVIVA_GATEWAY_URL,
+        });
+        await newConvivaAnalytics.initialize();
+        return newConvivaAnalytics;
+      }
+    }, []);
 
   const loadAsset = useCallback(
     (url: string) =>
-      player.load({
+      player?.load({
         url: url,
         type: SourceType.HLS,
         title: 'Art of Motion',
@@ -122,16 +145,16 @@ export default function App() {
   );
 
   const setupPlayer = useCallback(() => {
-    setPlayer((prevPlayer) => {
-      prevPlayer.destroy();
-      return createPlayer();
-    });
-  }, [createPlayer]);
+    setPlayer(createPlayer());
+  }, [createPlayer, setPlayer]);
 
   const release = useCallback(() => {
     convivaAnalytics?.release();
-    player.unload();
-  }, [player, convivaAnalytics]);
+    setConvivaAnalytics(undefined);
+    player?.unload();
+    player?.destroy();
+    setPlayer(undefined);
+  }, [player, convivaAnalytics, setConvivaAnalytics, setPlayer]);
 
   const pauseTracking = useCallback(() => {
     convivaAnalytics?.pauseTracking(false);
@@ -142,23 +165,32 @@ export default function App() {
   }, [convivaAnalytics]);
 
   const sendCustomEvent = useCallback(async () => {
-    const playerCurrentTime = await player.getCurrentTime();
+    const playerCurrentTime = await player?.getCurrentTime();
     convivaAnalytics?.sendCustomPlaybackEvent('Custom Event', {
-      'at Time': `${Math.floor(playerCurrentTime)}`,
+      'at Time': playerCurrentTime ? `${Math.floor(playerCurrentTime)}` : 'NA',
     });
   }, [convivaAnalytics, player]);
 
   useEffect(() => {
+    if (player === undefined) {
+      return;
+    }
     const urlToLoad =
       assetUrlRef.current !== undefined && validator.isURL(assetUrlRef.current)
         ? assetUrlRef.current
         : 'https://bitmovin-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8';
 
     createConvivaAnalytics().then((newConvivaAnalytics) => {
+      newConvivaAnalytics.updateContentMetadata({
+        applicationName: 'Bitmovin iOS Conviva integration example app',
+        viewerId: 'awesomeViewerId',
+        custom: { custom_tag: 'Episode' },
+        additionalStandardTags: { 'c3.cm.contentType': 'VOD' },
+      });
       setConvivaAnalytics(newConvivaAnalytics);
       loadAsset(urlToLoad);
     });
-  }, [createConvivaAnalytics, loadAsset]);
+  }, [createConvivaAnalytics, loadAsset, player, setConvivaAnalytics]);
 
   const [adsEnabled, setAdsEnabled] = useState(true);
 
@@ -203,15 +235,28 @@ export default function App() {
     }
   }, [convivaAnalytics]);
 
+  const startSession = useCallback(() => {
+    setConvivaAnalytics(undefined);
+    createConvivaAnalytics().then((newConvivaAnalytics) => {
+      newConvivaAnalytics.updateContentMetadata({
+        assetName: 'Art of Motion',
+      });
+      newConvivaAnalytics.initializeSession();
+      setConvivaAnalytics(newConvivaAnalytics);
+    });
+  }, [createConvivaAnalytics, setConvivaAnalytics]);
+
   const Container = Platform.isTV ? View : SafeAreaView;
 
   return (
     <Container style={styles.container}>
-      <PlayerView
-        style={styles.player}
-        player={player}
-        viewRef={playerViewRef}
-      />
+      {(player && (
+        <PlayerView
+          style={styles.player}
+          player={player}
+          viewRef={playerViewRef}
+        />
+      )) || <View style={styles.player} />}
       {!Platform.isTV && (
         <>
           <View style={styles.adControlContainer}>
@@ -226,7 +271,7 @@ export default function App() {
               assetUrlRef.current = text;
             }}
           />
-          <View style={styles.buttonContainer}>
+          <View style={styles.buttonRowContainer}>
             <Button
               title="Setup"
               onPress={() => {
@@ -235,11 +280,16 @@ export default function App() {
             />
             <Button title="Release" onPress={release} />
           </View>
-          <View style={styles.buttonContainer}>
+          <View style={styles.buttonRowContainer}>
             <Button title="Pause tracking" onPress={pauseTracking} />
             <Button title="Resume Tracking" onPress={resumeTracking} />
           </View>
-          <Button title="Send custom event" onPress={sendCustomEvent} />
+          <View style={styles.buttonContainer}>
+            <Button title="Send custom event" onPress={sendCustomEvent} />
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button title="Start session" onPress={startSession} />
+          </View>
         </>
       )}
     </Container>
@@ -256,6 +306,7 @@ const styles = StyleSheet.create({
   player: {
     aspectRatio: 16 / 9,
     backgroundColor: 'black',
+    width: '100%',
   },
   adControlContainer: {
     flexDirection: 'row',
@@ -273,8 +324,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 8,
   },
-  buttonContainer: {
+  buttonRowContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 16,
+  },
+  buttonContainer: {
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 16,

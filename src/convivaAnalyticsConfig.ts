@@ -7,8 +7,10 @@ import type { NativeInstanceConfig } from './nativeInstance';
 export interface ConvivaAnalyticsConfig extends NativeInstanceConfig {
   /**
    * The player instance which will be used for tracking.
+   * When not set at initialization, {@link ConvivaAnalytics.initializeSession} must be called after creating the {@link ConvivaAnalytics} instance.
+   * The player instance can be set later via the {@link ConvivaAnalytics.attachPlayer} method.
    */
-  player: Player;
+  player?: Player;
   /**
    * The customer key which will be used for tracking.
    */

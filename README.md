@@ -215,3 +215,43 @@ If you want to use the same player instance for multiple playback, just load a n
 ```ts
 player.load(…);
 ```
+
+### External VST tracking
+
+If your app needs additional setup steps which should be included in VST tracking, such as DRM token generation, before the `Player` instance can be initialized,
+the `ConvivaAnalytics` can be initialized without a `Player` instance. Once the `Player` instance is created it can be attached.
+
+1. Create the `ConvivaAnalytics` instance with your `customerKey`.
+
+```ts
+const convivaAnalytics = useConvivaAnalytics({
+  customerKey: 'YOUR-CONVIVA-CUSTOMER-KEY',
+});
+
+const onConvivaSetupError = useCallback((error) => {
+  console.error('Conviva error', error);
+}, []);
+
+// Initialize ConvivaAnalytics
+convivaAnalytics.initialize().catch(onConvivaSetupError);
+```
+
+2. Conviva requires that the `assetName` is set at session initialization. Therefore ensure that you provide using the `ConvivaAnalytics.updateContentMetadata()` **before** initializing the tracking session.
+
+```ts
+convivaAnalytics.updateContentMetadata({
+  assetName: 'Your Asset Name',
+});
+
+// Initialize tracking session
+convivaAnalytics.initializeSession();
+```
+
+3. Once your `Player` instance is ready attach it to the `ConvivaAnalytics` instance.
+
+```ts
+// ... Additional setup steps
+
+const player = usePlayer();
+convivaAnalytics.attachPlayer(player);
+```
