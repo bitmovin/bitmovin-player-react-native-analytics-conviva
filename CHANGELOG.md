@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.4.0]
 
 ### Changed
 - Updated the Bitmovin Player Conviva Analytics Integration for Android dependency to `2.7.0`.
