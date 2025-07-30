@@ -36,7 +36,7 @@
     "prepare": "husky install",
     "bootstrap": "yarn && yarn example install && yarn example pods && yarn brew",
     "pods": "yarn example pods",
-    "brew": "[ \"$(uname)\" != Darwin ] || brew bundle install --no-lock"
+    "brew": "[ \"$(uname)\" != Darwin ] || brew bundle install"
   },
   "keywords": [
     "react-native",
