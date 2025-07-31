@@ -8,10 +8,8 @@ on:
       - 'package.json'
       - 'yarn.lock'
       - 'ios/**'
-      - 'bitmovin-player-react-native-analytics-conviva.podspec'
+      - 'ios/bitmovin-player-react-native-analytics-conviva.podspec'
       - '.swiftlint.yml'
-      - 'Brewfile.lock.json'
-      - 'example/ios/**'
       - 'example/package.json'
       - 'example/yarn.lock'
 
@@ -23,19 +21,14 @@ on:
       - 'package.json'
       - 'yarn.lock'
       - 'ios/**'
-      - 'bitmovin-player-react-native-analytics-conviva.podspec'
+      - 'ios/bitmovin-player-react-native-analytics-conviva.podspec'
       - '.swiftlint.yml'
-      - 'Brewfile.lock.json'
-      - 'example/ios/**'
       - 'example/package.json'
       - 'example/yarn.lock'
 
 concurrency:
   group: ci-ios-tvos-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
-env:
-  NO_FLIPPER: 1
 
 jobs:
   code-style-ios:
@@ -49,9 +42,10 @@ jobs:
         uses: ./.github/actions/setup-environment
         with:
           ios: true
+          node: true
 
       - name: Check code style
-        run: swiftlint --strict
+        run: yarn lint:ios
 
   test-build-ios:
     name: Build iOS
@@ -78,9 +72,7 @@ jobs:
           restore-keys: pods-
 
       - name: Install pods
-        run: |
-          pod repo add bitmovin https://github.com/bitmovin/cocoapod-specs.git || pod repo update bitmovin
-          yarn pods
+        run: yarn pods
         env:
           CP_HOME_DIR: ${{ github.workspace }}/.cocoapods-cache
 
@@ -94,8 +86,7 @@ jobs:
           key: ${{ steps.pods-cache-restore.outputs.cache-primary-key }}
 
       - name: Build iOS example
-        run: rm -f .xcode.env.local && set -o pipefail && xcodebuild -workspace BitmovinPlayerReactNativeAnalyticsConvivaExample.xcworkspace -scheme BitmovinPlayerReactNativeAnalyticsConvivaExample -configuration Debug build CODE_SIGNING_ALLOWED='NO' | xcbeautify --renderer github-actions
-        working-directory: example/ios
+        run: yarn example build:ios --renderer github-actions
         env:
           NSUnbufferedIO: YES
 
@@ -124,9 +115,7 @@ jobs:
           restore-keys: pods-
 
       - name: Install pods
-        run: |
-          pod repo add bitmovin https://github.com/bitmovin/cocoapod-specs.git || pod repo update bitmovin
-          yarn example pods
+        run: yarn example pods
         env:
           CP_HOME_DIR: ${{ github.workspace }}/.cocoapods-cache
 
@@ -139,8 +128,12 @@ jobs:
             example/ios/Pods
           key: ${{ steps.pods-cache-restore.outputs.cache-primary-key }}
 
+      - name: Prebuild tvOS example
+        run: yarn example prebuild:tv --clean
+        env:
+          NSUnbufferedIO: YES
+
       - name: Build tvOS example
-        run: rm -f .xcode.env.local && set -o pipefail && xcodebuild -workspace BitmovinPlayerReactNativeAnalyticsConvivaExample.xcworkspace -scheme BitmovinPlayerReactNativeAnalyticsConvivaExample-tvOS -configuration Debug build CODE_SIGNING_ALLOWED='NO' | xcbeautify --renderer github-actions
-        working-directory: example/ios
+        run: yarn example build:tvos --renderer github-actions
         env:
           NSUnbufferedIO: YES

@@ -1,8 +1,28 @@
 # Changelog
 
+## [Unreleased]
+
+### Breaking Change
+
+- Introduction of Expo SDK support. Upgrading requires following the "Migration from Manual iOS Configuration" section in [README.md](README.md)
+
+### Added
+
+- React Native New Architecture Support
+- Expo Config Plugin to manage native configuration from `app.config.ts`.
+- Automatic configuration for Bitmovin iOS Conviva Analytics dependency version through Expo plugin.
+
+### Changed
+
+- Minimum `bitmovin-player-react-native` version is now `1.0.0`
+- Minimum iOS/tvOS version is now 15.1+ (was 14.0+).
+- Minimum Android SDK version is now 24 (was 21).
+- Native setup is now automated through Expo SDK - manual configuration is no longer required for v2.0.0+.
+
 ## [1.4.0] - 2024-09-06
 
 ### Changed
+
 - Updated the Bitmovin Player Conviva Analytics Integration for Android dependency to `2.7.0`.
 
 ## [1.3.0] - 2024-08-28

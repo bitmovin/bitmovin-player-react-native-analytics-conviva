@@ -1,56 +1,45 @@
 # Example Application
 
-This is a React Native application built to showcase the features of `bitmovin-player-react-native-analytics-conviva`. The code for example usage of this library is contained inside the [`example/src/App.tsx`](https://github.com/bitmovin/bitmovin-player-react-native-analytics-conviva/tree/main/example/src/App.tsx) directory:
+This is a modern Expo application built to showcase the features of `bitmovin-player-react-native-analytics-conviva`. The example uses the new Expo modules architecture and is independent from workspace dependencies.
 
 ## Getting started
 
-To get started with the project, run `yarn bootstrap` in the library's root directory (not `example/`). This will install dependencies for both the library and the example application (as well as native dependencies):
+This example app is now completely independent and uses Expo autolinking to resolve the parent analytics package.
 
-```sh
-cd bitmovin-player-react-native-analytics-conviva # Go to library's root directory
-yarn bootstrap # Install all dependencies
-```
+### Prerequisites
 
-## Configuring your license key
+- Node.js >= 18
+- Expo CLI: `npm install -g @expo/cli`
+- iOS: Xcode and iOS Simulator
+- Android: Android Studio and Android SDK
+- For TV: Apple TV Simulator (included in Xcode) or Android TV emulator
 
-Before running the application, make sure to set up your Bitmovin's license key in the native metadata file of each platform:
+### Environment Setup
 
-**iOS**
+1. Copy the `.env` file and configure your keys:
 
-Edit the license key in `example/ios/BitmovinPlayerReactNativeAnalyticsConvivaExample/Info.plist`:
+   ```sh
+   # The .env file is already configured - update the values as needed:
+   BITMOVIN_PLAYER_LICENSE_KEY="your-license-key"
+   EXPO_PUBLIC_CONVIVA_CUSTOMER_KEY="your-conviva-customer-key"
+   EXPO_PUBLIC_CONVIVA_GATEWAY_URL="your-conviva-gateway-url" # optional
+   APPLE_DEVELOPMENT_TEAM_ID="your-team-id" # for device builds
+   ```
 
-```xml
-<key>BitmovinPlayerLicenseKey</key>
-<string>ENTER_LICENSE_KEY</string>
-```
+2. Install dependencies:
+   ```sh
+   cd example
+   yarn install
+   ```
 
-**tvOS**
+## Configuration
 
-Edit the license key in `example/ios/BitmovinPlayerReactNativeAnalyticsConvivaExample-tvOS/Info.plist`:
+The app is configured through `app.config.ts` with support for:
 
-```xml
-<key>BitmovinPlayerLicenseKey</key>
-<string>ENTER_LICENSE_KEY</string>
-```
-
-**Android**
-
-Edit the license key in `example/android/app/src/main/AndroidManifest.xml`:
-
-```xml
-<meta-data android:name="BITMOVIN_PLAYER_LICENSE_KEY" android:value="<ENTER_LICENSE_KEY>" />
-```
-
-**Programmatically**
-
-Alternatively you can provide your license key programmatically via the config object of `usePlayer`. Providing it this way removes the need for the step above, but keep in mind that at least one of them is necessary to successfully run the examples.
-
-```ts
-const player = usePlayer({
-  // Just pass the key in the config object of `usePlayer` or `new Player()` in each example
-  licenseKey: 'Your-License-Key',
-});
-```
+- iOS, tvOS, Android, and Android TV platforms
+- Environment variables for license keys and Conviva configuration
+- Modern Expo modules architecture
+- TV-specific configurations and entitlements
 
 ### Add the Package Name and Bundle Identifiers as an Allowed Domain
 
@@ -76,29 +65,45 @@ com.bitmovin.PlayerReactNativeAnalyticsConvivaExample-tvOS
 
 ## Running the application
 
-**Terminal**
+### Development Scripts
 
 ```sh
-yarn example ios # Run examples on iOS
-yarn example android # Run examples on Android
+# Start Expo development server
+yarn start
+
+# Mobile platforms
+yarn prebuild --clean       # Prebuild native mobile apps
+yarn ios                    # Run on iOS simulator
+yarn android               # Run on Android emulator
+
+# TV platforms
+yarn prebuild:tv --clean # Prebuild native TV apps
+yarn ios:tv                 # Run on Apple TV simulator
+yarn android:tv            # Run on Android TV emulator
+
+# Web platform
+yarn web                    # Run on web browser
+
+# Generate native projects
+yarn prebuild              # Generate iOS/Android projects
+yarn prebuild --clean        # Clean and regenerate projects
 ```
 
-Hint: You can provide a specific simulator by name when using `--simulator` flag. `xcrun simctl list devices available` provides you with a list of available devices in your environment.
+### Platform-Specific Notes
 
-```sh
-yarn example ios --simulator="iPhone 15 Pro"
-```
+**iOS/tvOS Development:**
 
-**IDE**
+- Requires Xcode 15+ and iOS/tvOS 15.1+ deployment target
+- Uses `xcbeautify` for cleaner build output
 
-You can also open the iOS project using Xcode by typing `xed example/ios` on terminal, or `studio example/android` to open the android project in Android Studio (make sure to setup its binaries first).
+**Android/Android TV Development:**
 
-### Running the bundler only
+- Requires Android SDK 24+ (Android 7.0)
+- TV variant builds with `tvDebug` configuration
+- Supports Android TV leanback launcher
 
-The bundler is automatically started when running `yarn example android` or `yarn example ios` or when running via the IDEs, but it can also be started separately.
+**Troubleshooting:**
 
-To start the metro bundler, run the following command on the library's root (always execute `yarn` from the library's root):
-
-```sh
-yarn example start # Starts bundler on the example folder
-```
+- Run `yarn prebuild --clean` if you encounter native build issues
+- Check `.env` file configuration for missing environment variables
+- Ensure autolinking is working: parent package should be resolved automatically

@@ -1,0 +1,15 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": [
+      "BitmovinPlayerReactNativeAnalyticsConvivaModule",
+      "BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule"
+    ]
+  },
+  "android": {
+    "modules": [
+      "com.bitmovin.player.reactnative.analytics.conviva.BitmovinPlayerReactNativeAnalyticsConvivaModule",
+      "com.bitmovin.player.reactnative.analytics.conviva.BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule"
+    ]
+  }
+}

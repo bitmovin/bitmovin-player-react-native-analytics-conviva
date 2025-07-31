@@ -14,8 +14,8 @@ on:
       - '*prettier*'
       - '**babel.config.js'
       - 'tsconfig.json'
+      - 'typedoc.json'
       - '**yarn.lock'
-      - '**react-native.config.js'
       - '**metro.config.js'
       - '!*/android/**'
       - '!*/ios/**'
@@ -34,8 +34,8 @@ on:
       - '*prettier*'
       - '**babel.config.js'
       - 'tsconfig.json'
+      - 'typedoc.json'
       - '**yarn.lock'
-      - '**react-native.config.js'
       - '**metro.config.js'
       - '!*/android/**'
       - '!*/ios/**'
@@ -62,6 +62,9 @@ jobs:
       - name: Install node_modules
         run: yarn install --frozen-lockfile
 
+      - name: Install node_modules (example/)
+        run: yarn install --frozen-lockfile --cwd example
+
       - name: Lint Typescript
         run: yarn lint
 
@@ -85,5 +88,5 @@ jobs:
       - name: Install node_modules (example/)
         run: yarn install --frozen-lockfile --cwd example
 
-      - name: Compile TypeScript
-        run: yarn typescript
+      - name: Typecheck TypeScript
+        run: yarn typecheck:all
