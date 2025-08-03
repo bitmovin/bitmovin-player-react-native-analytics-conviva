@@ -128,7 +128,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     }
     if (viewRef !== undefined && viewRef.current !== null) {
       const node = findNodeHandle(viewRef.current);
-      if (node) {
+      if (node != null) {
         BitmovinPlayerReactNativeAnalyticsConvivaModule.setPlayerViewRef(
           this.nativeId,
           node
