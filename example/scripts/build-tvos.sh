@@ -6,8 +6,8 @@ set -e
 
 ARGS=$@
 
-xcodebuild -workspace ios/BitmovinPlayerReactNativeExample.xcworkspace \
-    -scheme BitmovinPlayerReactNativeExample \
+xcodebuild -workspace ios/BitmovinPlayerReactNativeAnalyticsConvivaExample.xcworkspace \
+    -scheme BitmovinPlayerReactNativeAnalyticsConvivaExample \
     -configuration Debug \
     -destination 'generic/platform=tvOS Simulator' \
     -quiet | xcbeautify -qq --disable-logging $ARGS
