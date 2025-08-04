@@ -16,21 +16,28 @@ This example app is now completely independent and uses Expo autolinking to reso
 
 ### Environment Setup
 
-1. Copy the `.env` file and configure your keys:
+1. **Create a local environment file:**
+   From the root of the repository, copy the example `.env` template:
 
-   ```sh
-   # The .env file is already configured - update the values as needed:
-   BITMOVIN_PLAYER_LICENSE_KEY="your-license-key"
-   EXPO_PUBLIC_CONVIVA_CUSTOMER_KEY="your-conviva-customer-key"
-   EXPO_PUBLIC_CONVIVA_GATEWAY_URL="your-conviva-gateway-url" # optional
-   APPLE_DEVELOPMENT_TEAM_ID="your-team-id" # for device builds
+   ```bash
+   cp example/.env.example example/.env
    ```
 
-2. Install dependencies:
-   ```sh
-   cd example
-   yarn install
-   ```
+2. **Add your credentials:**
+   Open `example/.env` and replace the placeholder values.
+   - The `BITMOVIN_PLAYER_LICENSE_KEY` is required.
+   - The `EXPO_PUBLIC_CONVIVA_CUSTOMER_KEY` is required.
+   - The `EXPO_PUBLIC_CONVIVA_GATEWAY_URL` is optional; for testing with Touchstone, you need to set this to the appropriate URL.
+   - The `APPLE_DEVELOPMENT_TEAM_ID` is optional and only needed if you want to build the app on a physical iOS or tvOS device. You can find your Apple Team ID on the [Apple Developer website](https://developer.apple.com/account/) under "Membership details".
+
+These values are loaded automatically by `example/app.config.ts` during the prebuild process and are not committed to version control. **This method is for internal development only.**
+
+### Re-generate the native iOS and Android applications
+
+When changing `example/.env` or `example/app.config.ts` you will need to re-generate the native iOS and Android applications to pick those changes up.
+
+The example application uses Expo Continuous Native Generation ([CNG](https://docs.expo.dev/workflow/continuous-native-generation/)) and the native apps can be re-generated using `yarn example prebuild`.
+See `yarn example prebuild -h` for all options.
 
 ## Configuration
 
@@ -54,13 +61,13 @@ com.bitmovin.player.reactnative.analytics.conviva.example
 #### iOS example application Bundle Identifier
 
 ```
-com.bitmovin.PlayerReactNativeAnalyticsConvivaExample
+com.bitmovin.player.reactnative.analytics.conviva.example
 ```
 
 #### tvOS example application Bundle Identifier
 
 ```
-com.bitmovin.PlayerReactNativeAnalyticsConvivaExample-tvOS
+com.bitmovin.player.reactnative.analytics.conviva.example
 ```
 
 ## Running the application
@@ -72,21 +79,14 @@ com.bitmovin.PlayerReactNativeAnalyticsConvivaExample-tvOS
 yarn start
 
 # Mobile platforms
-yarn prebuild --clean       # Prebuild native mobile apps
-yarn ios                    # Run on iOS simulator
-yarn android               # Run on Android emulator
+yarn example prebuild --clean       # Prebuild native mobile apps
+yarn example ios                    # Run on iOS simulator
+yarn example android               # Run on Android emulator
 
 # TV platforms
-yarn prebuild:tv --clean # Prebuild native TV apps
-yarn ios:tv                 # Run on Apple TV simulator
-yarn android:tv            # Run on Android TV emulator
-
-# Web platform
-yarn web                    # Run on web browser
-
-# Generate native projects
-yarn prebuild              # Generate iOS/Android projects
-yarn prebuild --clean        # Clean and regenerate projects
+yarn example prebuild:tv --clean # Prebuild native TV apps
+yarn example ios:tv                 # Run on Apple TV simulator
+yarn example android:tv            # Run on Android TV emulator
 ```
 
 ### Platform-Specific Notes
@@ -104,6 +104,6 @@ yarn prebuild --clean        # Clean and regenerate projects
 
 **Troubleshooting:**
 
-- Run `yarn prebuild --clean` if you encounter native build issues
-- Check `.env` file configuration for missing environment variables
+- Run `yarn example prebuild --clean` if you encounter native build issues
+- Check `example/.env` file configuration for missing environment variables
 - Ensure autolinking is working: parent package should be resolved automatically
