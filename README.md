@@ -46,6 +46,34 @@ Additionally to install the native dependencies, follow the next steps:
 
 ### iOS
 
+#### Option 1: Expo Config Plugin (Recommended)
+
+If you're using Expo, you can use the built-in config plugin for automatic iOS dependency configuration:
+
+```javascript
+// app.config.js or app.config.ts
+export default {
+  plugins: [
+    [
+      'bitmovin-player-react-native-analytics-conviva',
+      {
+        convivaAnalyticsVersion: '3.6.1', // Optional, defaults to 3.6.1
+      },
+    ],
+  ],
+};
+```
+
+The plugin will automatically:
+
+- Add the BitmovinConvivaAnalytics pod with Git source and tag
+- Ensure version compatibility (minimum 3.6.1)
+- Handle Podfile modifications during `expo prebuild`
+
+#### Option 2: Manual Installation
+
+If you're not using Expo or prefer manual configuration:
+
 Simply add the following lines to the top of your Podfile:
 
 ```ruby
@@ -53,10 +81,10 @@ source 'https://cdn.cocoapods.org'
 source 'https://github.com/bitmovin/cocoapod-specs.git'
 ```
 
-The the following line to your desired target:
+Then add the following line to your desired target:
 
 ```ruby
-pod 'BitmovinConvivaAnalytics', git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git', tag: '3.3.2'
+pod 'BitmovinConvivaAnalytics', git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git', tag: '3.6.1'
 ```
 
 Then, in your command line run in your `ios` folder:
@@ -255,3 +283,66 @@ convivaAnalytics.initializeSession();
 const player = usePlayer();
 convivaAnalytics.attachPlayer(player);
 ```
+
+## Migration from Manual iOS Configuration
+
+If you were previously configuring the BitmovinConvivaAnalytics pod manually using `expo-build-properties` or in the `Podfile` directly, you can migrate to the config plugin for easier maintenance:
+
+### Before (Manual Configuration)
+
+```javascript
+// app.config.js
+export default {
+  plugins: [
+    [
+      'expo-build-properties',
+      {
+        ios: {
+          extraPods: [
+            {
+              name: 'BitmovinConvivaAnalytics',
+              git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git',
+              tag: '3.6.1',
+            },
+          ],
+        },
+      },
+    ],
+  ],
+};
+```
+
+### After (Automatic Configuration)
+
+#### Use default version
+
+```javascript
+// app.config.js
+export default {
+  plugins: ['bitmovin-player-react-native-analytics-conviva'],
+};
+```
+
+### Use specific version
+
+```javascript
+// app.config.js
+export default {
+  plugins: [
+    [
+      'bitmovin-player-react-native-analytics-conviva',
+      {
+        convivaAnalyticsVersion: '3.6.1', // Optional
+      },
+    ],
+  ],
+};
+```
+
+## Configuration Options
+
+The Expo config plugin supports the following options:
+
+| Option                    | Type   | Default | Description                                                   |
+| ------------------------- | ------ | ------- | ------------------------------------------------------------- |
+| `convivaAnalyticsVersion` | string | "3.6.1" | Version of BitmovinConvivaAnalytics iOS pod. Must be >= 3.6.1 |

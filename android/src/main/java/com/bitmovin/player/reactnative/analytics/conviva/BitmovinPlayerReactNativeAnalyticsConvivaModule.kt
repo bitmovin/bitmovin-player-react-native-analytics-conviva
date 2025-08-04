@@ -2,176 +2,155 @@ package com.bitmovin.player.reactnative.analytics.conviva
 
 import com.bitmovin.analytics.conviva.ConvivaAnalyticsIntegration
 import com.bitmovin.analytics.conviva.ConvivaConfig
+import com.bitmovin.player.reactnative.PlayerRegistry
 import com.bitmovin.player.reactnative.analytics.conviva.converter.toErrorSeverity
 import com.bitmovin.player.reactnative.analytics.conviva.converter.toMetadataOverrides
-import com.bitmovin.player.reactnative.extensions.playerModule
-import com.bitmovin.player.reactnative.extensions.toMap
-import com.facebook.react.bridge.*
-import com.facebook.react.module.annotations.ReactModule
+import expo.modules.kotlin.exception.CodedException
+import expo.modules.kotlin.functions.Queues
+import expo.modules.kotlin.modules.Module
+import expo.modules.kotlin.modules.ModuleDefinition
 
-@ReactModule(name = BitmovinPlayerReactNativeAnalyticsConvivaModule.NAME)
-class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationContext) :
-    BitmovinBaseModule(context) {
+class BitmovinPlayerReactNativeAnalyticsConvivaModule : Module() {
 
     private val convivaAnalyticsInstances: Registry<ConvivaAnalyticsIntegration> = mutableMapOf()
 
-    override fun getName(): String {
-        return NAME
-    }
+    override fun definition() = ModuleDefinition {
+        Name(NAME)
 
-    @ReactMethod
-    fun initWithConfig(
-        nativeId: NativeId,
-        playerNativeId: NativeId?,
-        customerKey: String,
-        gatewayUrl: String?,
-        debugLoggingEnabled: Boolean,
-        promise: Promise,
-    ) {
-        promise.unit.resolveOnUiThread {
+        AsyncFunction("initWithConfig") { nativeId: String, playerNativeId: String?, customerKey: String, gatewayUrl: String?, debugLoggingEnabled: Boolean ->
             val player = playerNativeId?.let { id ->
-                context.playerModule?.getPlayerOrNull(id).also { playerById ->
-                    if (playerById == null) {
-                        promise.reject(NAME, "Could not retrieve Player with native Id $playerNativeId")
-                        return@resolveOnUiThread
-                    }
-                }
+                PlayerRegistry.getPlayer(id) ?: throw PlayerNotFoundException(id)
             }
 
             val config = ConvivaConfig()
             config.gatewayUrl = gatewayUrl
             config.isDebugLoggingEnabled = debugLoggingEnabled
-            val convivaAnalytics = ConvivaAnalyticsIntegration(
-                player,
-                customerKey,
-                context,
-                config,
-            )
-            convivaAnalyticsInstances[nativeId] = convivaAnalytics
-
-            promise.resolve(null)
-        }
-    }
-
-    @ReactMethod
-    fun attachPlayer(
-        nativeId: NativeId,
-        playerNativeId: NativeId,
-        promise: Promise,
-    ) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            val player = context.playerModule?.getPlayerOrNull(playerNativeId)
-            if (player == null) {
-                promise.reject(
-                    NAME,
-                    "Could not attach Player with native Id $playerNativeId to Conviva Analytics " +
-                        "with native Id $nativeId",
-                )
-                return@resolveOnUiThreadWithConvivaAnalytics
-            }
-
-            attachPlayer(player)
-            promise.resolve(null)
-        }
-    }
-
-    @ReactMethod
-    fun destroy(nativeId: NativeId, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            release()
-            convivaAnalyticsInstances.remove(nativeId)
-        }
-    }
-
-    @ReactMethod
-    fun release(nativeId: NativeId, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            release()
-        }
-    }
-
-    @ReactMethod
-    fun initializeSession(nativeId: NativeId, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
             try {
-                initializeSession()
-                promise.resolve(null)
+                val convivaAnalytics = ConvivaAnalyticsIntegration(
+                    player,
+                    customerKey,
+                    appContext.reactContext,
+                    config,
+                )
+                convivaAnalyticsInstances[nativeId] = convivaAnalytics
             } catch (e: Exception) {
-                promise.reject(NAME, "Could not initialize session for Conviva Analytics with native Id $nativeId", e)
+                throw InitializationFailedException(nativeId, playerNativeId, customerKey, e)
             }
-        }
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("attachPlayer") { nativeId: String, playerNativeId: String ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            val player = PlayerRegistry.getPlayer(playerNativeId)
+                ?: throw PlayerNotFoundException(playerNativeId)
+
+            convivaAnalytics.attachPlayer(player)
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("destroy") { nativeId: String ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.release()
+            convivaAnalyticsInstances.remove(nativeId)
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("release") { nativeId: String ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.release()
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("initializeSession") { nativeId: String ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            try {
+                convivaAnalytics.initializeSession()
+            } catch (e: Exception) {
+                throw SessionInitializationFailedException(nativeId, e)
+            }
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("endSession") { nativeId: String ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.endSession()
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("updateContentMetadata") { nativeId: String, contentMetadata: Map<String, Any?> ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.updateContentMetadata(contentMetadata.toMetadataOverrides())
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("sendCustomApplicationEvent") { nativeId: String, name: String, attributes: Map<String, Any?> ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.sendCustomApplicationEvent(name, attributes)
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("sendCustomPlaybackEvent") { nativeId: String, name: String, attributes: Map<String, Any?> ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.sendCustomPlaybackEvent(name, attributes)
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("reportPlaybackDeficiency") { nativeId: String, message: String, severity: String, endSession: Boolean ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            val errorSeverity = severity.toErrorSeverity()
+                ?: throw InvalidSeverityException(severity)
+            
+            convivaAnalytics.reportPlaybackDeficiency(message, errorSeverity, endSession)
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("pauseTracking") { nativeId: String, isBumper: Boolean ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.pauseTracking(isBumper)
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("resumeTracking") { nativeId: String ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.resumeTracking()
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("reportAppForegrounded") { nativeId: String ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.reportAppForegrounded()
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("reportAppBackgrounded") { nativeId: String ->
+            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
+                ?: throw ConvivaNotFoundException(nativeId)
+            
+            convivaAnalytics.reportAppBackgrounded()
+        }.runOnQueue(Queues.MAIN)
+
+        // iOS only functions (no-op on Android)
+        AsyncFunction("setPlayerViewRef") { _: String, _: Int ->
+            // No-op on Android
+        }.runOnQueue(Queues.MAIN)
+
+        AsyncFunction("resetPlayerViewRef") { _: String ->
+            // No-op on Android
+        }.runOnQueue(Queues.MAIN)
     }
 
-    @ReactMethod
-    fun endSession(nativeId: NativeId, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            endSession()
-        }
-    }
-
-    @ReactMethod
-    fun updateContentMetadata(nativeId: NativeId, contentMetadata: ReadableMap, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            updateContentMetadata(contentMetadata.toMetadataOverrides())
-        }
-    }
-
-    @ReactMethod
-    fun sendCustomApplicationEvent(nativeId: NativeId, name: String, attributes: ReadableMap, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            sendCustomApplicationEvent(name, attributes.toMap())
-        }
-    }
-
-    @ReactMethod
-    fun sendCustomPlaybackEvent(nativeId: NativeId, name: String, attributes: ReadableMap, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            sendCustomPlaybackEvent(name, attributes.toMap())
-        }
-    }
-
-    @ReactMethod
-    fun reportPlaybackDeficiency(
-        nativeId: NativeId,
-        message: String,
-        severity: String,
-        endSession: Boolean,
-        promise: Promise,
-    ) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            reportPlaybackDeficiency(message, severity.toErrorSeverity(), endSession)
-        }
-    }
-
-    @ReactMethod
-    fun pauseTracking(nativeId: NativeId, isBumper: Boolean, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            pauseTracking(isBumper)
-        }
-    }
-
-    @ReactMethod
-    fun resumeTracking(nativeId: NativeId, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            resumeTracking()
-        }
-    }
-
-    @ReactMethod
-    fun reportAppForegrounded(nativeId: NativeId, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            reportAppForegrounded()
-        }
-    }
-
-    @ReactMethod
-    fun reportAppBackgrounded(nativeId: NativeId, promise: Promise) {
-        promise.unit.resolveOnUiThreadWithConvivaAnalytics(nativeId) {
-            reportAppBackgrounded()
-        }
-    }
-
-    internal fun getConvivaAnalyticsOrNull(nativeId: NativeId): ConvivaAnalyticsIntegration? {
+    internal fun getConvivaAnalyticsOrNull(nativeId: String): ConvivaAnalyticsIntegration? {
         return convivaAnalyticsInstances[nativeId]
     }
 
@@ -179,3 +158,26 @@ class BitmovinPlayerReactNativeAnalyticsConvivaModule(context: ReactApplicationC
         const val NAME = "BitmovinPlayerReactNativeAnalyticsConviva"
     }
 }
+
+// Exception classes
+internal class PlayerNotFoundException(playerId: String) :
+    CodedException("Could not retrieve Player with native Id $playerId")
+
+internal class ConvivaNotFoundException(nativeId: String) :
+    CodedException("Could not retrieve Conviva Analytics instance with native Id $nativeId")
+
+internal class InitializationFailedException(
+    nativeId: String,
+    playerNativeId: String?,
+    customerKey: String,
+    cause: Throwable
+) : CodedException(
+    "Could not initialize Conviva Analytics with native Id $nativeId " +
+    "using playerNativeId ${playerNativeId ?: "null"} and customerKey $customerKey: ${cause.message}"
+)
+
+internal class SessionInitializationFailedException(nativeId: String, cause: Throwable) :
+    CodedException("Could not initialize session for Conviva Analytics with native Id $nativeId: ${cause.message}")
+
+internal class InvalidSeverityException(severity: String) :
+    CodedException("Invalid severity value \"$severity\"")

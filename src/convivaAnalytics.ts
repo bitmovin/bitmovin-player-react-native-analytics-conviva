@@ -1,12 +1,11 @@
+import BitmovinPlayerReactNativeAnalyticsConvivaModule from './modules/BitmovinPlayerReactNativeAnalyticsConvivaModule';
 import type { ConvivaMetadataOverrides } from './convivaMetadataOverrides';
 import type { ConvivaErrorSeverity } from './convivaErrorSeverity';
-import { Platform, NativeModules, findNodeHandle } from 'react-native';
+import { Platform, findNodeHandle } from 'react-native';
 import NativeInstance from './nativeInstance';
 import type { ConvivaAnalyticsConfig } from './convivaAnalyticsConfig';
 import { SsaiApi } from './ssaiApi';
 import type { Player } from 'bitmovin-player-react-native';
-
-const { BitmovinPlayerReactNativeAnalyticsConviva } = NativeModules;
 
 /**
  * The ConvivaAnalytics class is used to interact with the Conviva Analytics SDK.
@@ -33,11 +32,12 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
       return;
     }
     this.isInitialized = true;
-    return BitmovinPlayerReactNativeAnalyticsConviva.initWithConfig(
+    await this.config?.player?.initialize();
+    return BitmovinPlayerReactNativeAnalyticsConvivaModule.initWithConfig(
       this.nativeId,
-      this.config?.player?.nativeId,
-      this.config?.customerKey,
-      this.config?.gatewayUrl,
+      this.config?.player?.nativeId ?? null,
+      this.config?.customerKey ?? '',
+      this.config?.gatewayUrl ?? null,
       this.config?.debugLoggingEnabled ?? false
     );
   };
@@ -58,7 +58,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   initializeSession = async (): Promise<void> => {
-    return BitmovinPlayerReactNativeAnalyticsConviva.initializeSession(
+    return BitmovinPlayerReactNativeAnalyticsConvivaModule.initializeSession(
       this.nativeId
     );
   };
@@ -75,7 +75,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   attachPlayer = async (player: Player): Promise<void> => {
-    return BitmovinPlayerReactNativeAnalyticsConviva.attachPlayer(
+    return BitmovinPlayerReactNativeAnalyticsConvivaModule.attachPlayer(
       this.nativeId,
       player.nativeId
     );
@@ -86,7 +86,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    */
   destroy = () => {
     if (!this.isDestroyed) {
-      BitmovinPlayerReactNativeAnalyticsConviva.destroy(this.nativeId);
+      BitmovinPlayerReactNativeAnalyticsConvivaModule.destroy(this.nativeId);
       this.isDestroyed = true;
     }
   };
@@ -97,7 +97,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   release = () => {
-    BitmovinPlayerReactNativeAnalyticsConviva.release(this.nativeId);
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.release(this.nativeId);
   };
 
   /**
@@ -110,7 +110,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   endSession = () => {
-    BitmovinPlayerReactNativeAnalyticsConviva.endSession(this.nativeId);
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.endSession(this.nativeId);
   };
 
   /**
@@ -128,12 +128,14 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     }
     if (viewRef !== undefined && viewRef.current !== null) {
       const node = findNodeHandle(viewRef.current);
-      BitmovinPlayerReactNativeAnalyticsConviva.setPlayerViewRef(
-        this.nativeId,
-        node
-      );
+      if (node != null) {
+        BitmovinPlayerReactNativeAnalyticsConvivaModule.setPlayerViewRef(
+          this.nativeId,
+          node
+        );
+      }
     } else {
-      BitmovinPlayerReactNativeAnalyticsConviva.resetPlayerViewRef(
+      BitmovinPlayerReactNativeAnalyticsConvivaModule.resetPlayerViewRef(
         this.nativeId
       );
     }
@@ -154,7 +156,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   updateContentMetadata = (metadata: ConvivaMetadataOverrides) => {
-    BitmovinPlayerReactNativeAnalyticsConviva.updateContentMetadata(
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.updateContentMetadata(
       this.nativeId,
       metadata
     );
@@ -173,7 +175,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     name: string,
     attributes: { [key: string]: string }
   ) => {
-    BitmovinPlayerReactNativeAnalyticsConviva.sendCustomApplicationEvent(
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.sendCustomApplicationEvent(
       this.nativeId,
       name,
       attributes
@@ -193,7 +195,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     name: string,
     attributes: { [key: string]: string }
   ) => {
-    BitmovinPlayerReactNativeAnalyticsConviva.sendCustomPlaybackEvent(
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.sendCustomPlaybackEvent(
       this.nativeId,
       name,
       attributes
@@ -215,7 +217,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
     severity: ConvivaErrorSeverity,
     endSession: boolean = true
   ) => {
-    BitmovinPlayerReactNativeAnalyticsConviva.reportPlaybackDeficiency(
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.reportPlaybackDeficiency(
       this.nativeId,
       message,
       severity,
@@ -232,7 +234,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   pauseTracking = (isBumper: boolean) => {
-    BitmovinPlayerReactNativeAnalyticsConviva.pauseTracking(
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.pauseTracking(
       this.nativeId,
       isBumper
     );
@@ -243,7 +245,9 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
    * @platform Android, iOS, tvOS
    */
   resumeTracking = () => {
-    BitmovinPlayerReactNativeAnalyticsConviva.resumeTracking(this.nativeId);
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.resumeTracking(
+      this.nativeId
+    );
   };
 
   /**
@@ -260,7 +264,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
       );
       return;
     }
-    BitmovinPlayerReactNativeAnalyticsConviva.reportAppForegrounded(
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.reportAppForegrounded(
       this.nativeId
     );
   };
@@ -279,7 +283,7 @@ export class ConvivaAnalytics extends NativeInstance<ConvivaAnalyticsConfig> {
       );
       return;
     }
-    BitmovinPlayerReactNativeAnalyticsConviva.reportAppBackgrounded(
+    BitmovinPlayerReactNativeAnalyticsConvivaModule.reportAppBackgrounded(
       this.nativeId
     );
   };

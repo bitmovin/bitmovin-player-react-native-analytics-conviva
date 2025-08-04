@@ -1,6 +1,4 @@
-import { NativeModules } from 'react-native';
-
-const { BitmovinPlayerReactNativeAnalyticsConvivaSsai } = NativeModules;
+import BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule from './modules/BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule';
 
 export enum SsaiAdPosition {
   PREROLL = 'preroll',
@@ -69,7 +67,7 @@ export class SsaiApi {
    * @platform Android, iOS, tvOS
    */
   isAdBreakActive = async (): Promise<boolean> => {
-    return BitmovinPlayerReactNativeAnalyticsConvivaSsai.isAdBreakActive(
+    return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.isAdBreakActive(
       this.nativeId
     );
   };
@@ -84,7 +82,7 @@ export class SsaiApi {
   reportAdBreakStarted = async (
     adBreakInfo: { [key: string]: any } | undefined = undefined
   ): Promise<void> => {
-    return BitmovinPlayerReactNativeAnalyticsConvivaSsai.reportAdBreakStarted(
+    return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdBreakStarted(
       this.nativeId,
       adBreakInfo
     );
@@ -97,7 +95,7 @@ export class SsaiApi {
    * @platform Android, iOS, tvOS
    */
   reportAdBreakFinished = async (): Promise<void> => {
-    return BitmovinPlayerReactNativeAnalyticsConvivaSsai.reportAdBreakFinished(
+    return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdBreakFinished(
       this.nativeId
     );
   };
@@ -111,7 +109,7 @@ export class SsaiApi {
    * @platform Android, iOS, tvOS
    */
   reportAdStarted = async (adInfo: SsaiAdInfo): Promise<void> => {
-    return BitmovinPlayerReactNativeAnalyticsConvivaSsai.reportAdStarted(
+    return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdStarted(
       this.nativeId,
       adInfo
     );
@@ -124,7 +122,7 @@ export class SsaiApi {
    * @platform Android, iOS, tvOS
    */
   reportAdFinished = async (): Promise<void> => {
-    return BitmovinPlayerReactNativeAnalyticsConvivaSsai.reportAdFinished(
+    return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdFinished(
       this.nativeId
     );
   };
@@ -136,7 +134,7 @@ export class SsaiApi {
    * @platform Android, iOS, tvOS
    */
   reportAdSkipped = async (): Promise<void> => {
-    return BitmovinPlayerReactNativeAnalyticsConvivaSsai.reportAdSkipped(
+    return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdSkipped(
       this.nativeId
     );
   };
@@ -149,7 +147,7 @@ export class SsaiApi {
    * @platform Android, iOS, tvOS
    */
   updateAdInfo = async (adInfo: SsaiAdInfo): Promise<void> => {
-    BitmovinPlayerReactNativeAnalyticsConvivaSsai.updateAdInfo(
+    BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.updateAdInfo(
       this.nativeId,
       adInfo
     );

@@ -2,18 +2,19 @@
   "name": "bitmovin-player-react-native-analytics-conviva",
   "version": "1.4.1-alpha.0",
   "description": "Conviva Analytics Integration for the Bitmovin Player React Native SDK",
-  "main": "lib/commonjs/index",
-  "module": "lib/module/index",
-  "types": "lib/typescript/src/index.d.ts",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
   "files": [
     "src",
-    "lib",
+    "build",
     "android",
     "ios",
     "cpp",
     "*.podspec",
+    "app.plugin.js",
+    "plugin/build",
     "!ios/build",
     "!android/build",
     "!android/gradle",
@@ -26,28 +27,54 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace bitmovin-player-react-native-analytics-conviva-example",
-    "test": "jest",
-    "typescript": "tsc --noEmit",
-    "lint": "eslint . --max-warnings=0 --ext .ts,.tsx",
-    "format": "prettier --write .",
-    "build": "tsup ./src/index.ts --dts --target es2020 --format cjs,esm -d lib",
-    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "husky install",
-    "bootstrap": "yarn && yarn example install && yarn example pods && yarn brew",
+    "build": "yarn build:module && yarn build:plugin",
+    "build:module": "EXPO_NONINTERACTIVE=true expo-module build",
+    "build:plugin": "EXPO_NONINTERACTIVE=true expo-module build plugin",
+    "clean": "expo-module clean",
+    "dev:plugin": "expo-module build plugin",
+    "lint": "expo-module lint",
+    "prepare": "expo-module prepare",
+    "prepublishOnly": "expo-module prepublishOnly",
+    "module": "expo-module",
+    "typecheck": "tsc --noEmit",
+    "typecheck:all": "yarn typecheck && yarn example typecheck",
+    "format": "prettier --write '**/*.{ts,tsx,js,jsx,md,json,yml,yaml}'",
+    "format:ios": "./scripts/format-swift.sh",
+    "format:android": "./scripts/format-android.sh",
+    "format:all": "yarn format && yarn format:ios && yarn format:android",
+    "lint:all": "yarn lint && yarn example lint && yarn lint:ios && yarn lint:android",
+    "lint:ios": "swiftlint ios --strict --quiet",
+    "lint:android": "cd android && ./gradlew -b ktlint.gradle ktlintCheck --quiet --console=plain",
+    "setup-hooks": "./scripts/setup-hooks.sh",
+    "example": "yarn --cwd example",
+    "example:ios": "yarn example run:ios",
+    "example:android": "yarn example run:android",
+    "example:tvos": "yarn example run:tvos",
+    "example:android-tv": "yarn example run:android-tv",
     "pods": "yarn example pods",
+    "bootstrap": "yarn install && yarn brew && yarn build && yarn example bootstrap && yarn setup-hooks",
     "brew": "[ \"$(uname)\" != Darwin ] || brew bundle install"
   },
   "keywords": [
     "react-native",
+    "expo",
+    "bitmovin-player-react-native-analytics-conviva",
     "ios",
-    "android"
+    "android",
+    "tvos",
+    "androidtv",
+    "bitmovin",
+    "player",
+    "video",
+    "streaming",
+    "analytics",
+    "conviva"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/bitmovin/bitmovin-player-react-native-analytics-conviva"
   },
-  "author": "Bitmovin GmbH <support@bitmovin.com> (https://bitmovin.com)",
+  "author": "Bitmovin GmbH <player-sdks@bitmovin.com> (https://github.com/bitmovin)",
   "license": "MIT",
   "bugs": {
     "url": "https://dashboard.bitmovin.com/support/tickets"
@@ -56,68 +83,51 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
+  "dependencies": {
+    "@expo/config-plugins": "~10.1.2",
+    "expo-build-properties": "~0.14.8"
+  },
   "devDependencies": {
-    "@react-native/eslint-config": "^0.73.1",
-    "@types/jest": "^29.5.5",
-    "@types/react": "^18.2.44",
-    "bitmovin-player-react-native": "^0.25.0",
-    "del-cli": "^5.1.0",
-    "eslint": "^8.51.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "husky": "8.0.1",
-    "jest": "^29.7.0",
+    "@babel/core": "^7.28.0",
+    "@types/node": "^24.1.0",
+    "@types/react": "~19.0.10",
+    "@types/semver": "^7.7.0",
+    "bitmovin-player-react-native": "1.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-expo": "~9.2.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.5.1",
+    "expo": "53.0.20",
+    "expo-module-scripts": "^4.1.9",
     "lint-staged": "13.0.3",
-    "prettier": "^3.0.3",
-    "react": "18.2.0",
-    "react-native": "0.74.1",
-    "tsup": "7.2.0",
-    "typescript": "5.0.2"
+    "prettier": "^3.6.2",
+    "react": "19.0.0",
+    "react-native": "0.79.5",
+    "typedoc": "^0.28.7",
+    "typescript": "~5.8.3"
   },
   "resolutions": {
     "@types/react": "^18.2.44"
   },
   "peerDependencies": {
-    "bitmovin-player-react-native": ">=0.25.0",
+    "bitmovin-player-react-native": ">=1.0.0",
+    "expo": ">=53.0.0",
+    "expo-crypto": ">=14.0.0",
     "react": "*",
     "react-native": "*"
   },
-  "workspaces": [
-    "example"
-  ],
-  "packageManager": "yarn@3.6.1",
-  "jest": {
-    "preset": "react-native",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules",
-      "<rootDir>/lib/"
-    ]
-  },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@react-native",
-      "prettier"
-    ],
-    "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "quoteProps": "consistent",
-          "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "es5",
-          "useTabs": false
-        }
-      ]
-    }
-  },
-  "eslintIgnore": [
-    "node_modules/",
-    "lib/"
-  ],
   "lint-staged": {
-    "*.(ts|tsx)": "eslint",
+    "src/**/*.(ts|tsx)": "eslint --quiet",
+    "example/src/**/*.(ts|tsx)": "eslint --quiet --config example/.eslintrc.js",
+    "integration_test/{src,playertesting,tests}/**/*.(ts|tsx)": "eslint --quiet --config integration_test/.eslintrc.js",
+    "ios/**/*.swift": [
+      "./scripts/format-swift.sh",
+      "./scripts/lint-swift.sh"
+    ],
+    "android/**/*.kt": [
+      "./scripts/format-android.sh",
+      "./scripts/lint-android.sh"
+    ],
     "*.(ts|tsx|js|jsx|md|json|yml|yaml)": "prettier --write"
   }
 }
