@@ -1,6 +1,6 @@
 {
   "name": "bitmovin-player-react-native-analytics-conviva",
-  "version": "1.4.1-alpha.0",
+  "version": "2.0.0",
   "description": "Conviva Analytics Integration for the Bitmovin Player React Native SDK",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
