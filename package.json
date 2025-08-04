@@ -92,7 +92,7 @@
     "@types/node": "^24.1.0",
     "@types/react": "~19.0.10",
     "@types/semver": "^7.7.0",
-    "bitmovin-player-react-native": "1.0.0-alpha.3",
+    "bitmovin-player-react-native": "1.0.0-alpha.4",
     "eslint": "^8.57.0",
     "eslint-config-expo": "~9.2.0",
     "eslint-config-prettier": "^9.1.0",
@@ -110,7 +110,7 @@
     "@types/react": "^18.2.44"
   },
   "peerDependencies": {
-    "bitmovin-player-react-native": ">=1.0.0-alpha.3",
+    "bitmovin-player-react-native": ">=1.0.0-alpha.4",
     "expo": ">=53.0.0",
     "expo-crypto": ">=14.0.0",
     "react": "*",
