@@ -2308,10 +2308,10 @@ big-integer@1.6.x:
   resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.52.tgz#60a887f3047614a8e1bffe5d7173490a97dc8c85"
   integrity sha512-QxD8cf2eVqJOOz63z6JIN9BzvVs/dlySa5HGSBH5xtR8dPteIRQnBxxKqkNTiT6jbDTF6jAfrd4oMcND9RGbQg==
 
-bitmovin-player-react-native@1.0.0-alpha.4:
-  version "1.0.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/bitmovin-player-react-native/-/bitmovin-player-react-native-1.0.0-alpha.4.tgz#12ad2e79047cde205976ccad1e5ad32713e8980f"
-  integrity sha512-hsPHmNvKyNJ0iYXwoY1E0wp93qXJGh1Bx6R3VvD2meznMAFT7vOs0whf4Sf1JEsJIyIVP00fXL2GR2IGA288Bg==
+bitmovin-player-react-native@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/bitmovin-player-react-native/-/bitmovin-player-react-native-1.0.0.tgz#b96be9a4d30574b1b343034deb7e2103545e9e76"
+  integrity sha512-5hQAnncGkArKjQx7cr5V/YMc7efXoLqvHaEMsBV5fPYJqVGTObzuLtrU6hvyXo5jylkPhiWg0tsyAVAqNSJIRw==
   dependencies:
     "@expo/config-plugins" "~10.1.2"
     expo-crypto "~14.1.5"

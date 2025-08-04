@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@react-native-tvos/config-tv": "^0.1.1",
-    "bitmovin-player-react-native": "1.0.0-alpha.4",
+    "bitmovin-player-react-native": "1.0.0",
     "expo": "53.0.20",
     "expo-build-properties": "~0.14.8",
     "expo-crypto": "~14.1.5",
