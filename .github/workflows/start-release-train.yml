@@ -94,4 +94,4 @@ jobs:
           # Try to add reviewer - this may fail due to permissions but PR is already created
           gh pr edit "$PR_NUMBER" --add-reviewer "${{ github.actor }}" || true
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
