@@ -65,6 +65,7 @@ jobs:
       - name: Bump package.json version
         run: |
           yarn version --new-version ${{ inputs.version_number }} --no-git-tag-version
+          git status
 
       - name: Commit changelog version bump
         if: ${{ !inputs.dry_run }}
@@ -72,7 +73,6 @@ jobs:
           git add CHANGELOG.md package.json
           git commit --no-verify -m "prepare release ${{ inputs.version_number }}"
           git push origin ${{ steps.branching.outputs.branch_name }}
-          git status
 
       - name: Create PR
         if: ${{ !inputs.dry_run }}
