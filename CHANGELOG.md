@@ -4,7 +4,7 @@
 
 ### Breaking Change
 
-- Introduction of Expo SDK support. Upgrading requires following the "Migration from Manual iOS Configuration" section in [README.md](README.md)
+- Introduction of Expo SDK support. Upgrading requires following the "Migration from Manual iOS Configuration" section in [README.md](README.md#migration-from-manual-ios-configuration)
 
 ### Added
 
