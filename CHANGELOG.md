@@ -15,8 +15,8 @@
 ### Changed
 
 - Minimum `bitmovin-player-react-native` version is now `1.0.0`
-- Minimum iOS/tvOS version is now 15.1+ (was 14.0+).
-- Minimum Android SDK version is now 24 (was 21).
+- Minimum iOS/tvOS version is now 15.1+ (was 14.0+). Due to a transient React Native minimum [iOS/tvOS version change](https://github.com/react-native-community/discussions-and-proposals/discussions/812).
+- Minimum Android SDK version is now 24 (was 21). Due to a transient React Native minimum [Android version change](https://github.com/react-native-community/discussions-and-proposals/discussions/802).
 - Native setup is now automated through Expo SDK - manual configuration is no longer required for v2.0.0+.
 
 ## [1.4.0] - 2024-09-06
