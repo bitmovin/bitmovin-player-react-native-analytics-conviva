@@ -110,10 +110,18 @@ jobs:
       - name: Create PR
         if: ${{ !inputs.dry_run }}
         run: |
-          gh pr create \
-          --base "main" \
-          --title "Release ${{ inputs.version_number }}" \
-          --body "Release ${{ inputs.version_number }}. Please review and merge this PR to continue the release process." \
-          --reviewer "${{ github.actor }}"
+          # Create PR and capture the URL
+          PR_URL=$(gh pr create \
+            --base "support/v1" \
+            --title "Release ${{ inputs.version_number }}" \
+            --body "Release ${{ inputs.version_number }}. Please review and merge this PR to continue the release process.")
+          
+          echo "Created PR: $PR_URL"
+          
+          # Extract PR number from URL
+          PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
+          
+          # Try to add reviewer - this may fail due to permissions but PR is already created
+          gh pr edit "$PR_NUMBER" --add-reviewer "${{ github.actor }}" || true
         env:
           GH_TOKEN: ${{ github.token }}
