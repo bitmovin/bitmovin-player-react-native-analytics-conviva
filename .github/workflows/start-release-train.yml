@@ -27,6 +27,9 @@ jobs:
   create_release_pr:
     name: Create release branch and bump version
     runs-on: macos-15
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       branch_name: ${{ steps.branching.outputs.branch_name }}
     steps:
@@ -61,6 +64,7 @@ jobs:
         run: |
           sed -i'.bak' "s/\[Unreleased\]/\[${{ inputs.version_number }}\]/g" CHANGELOG.md
           awk 'BEGIN {count=0} /## \[/ {count++; if (count == 2) exit} {print}' CHANGELOG.md
+          rm -f CHANGELOG.md.bak
 
       - name: Bump package.json version
         run: |
@@ -73,13 +77,21 @@ jobs:
           git commit --no-verify -m "prepare release ${{ inputs.version_number }}"
           git push origin ${{ steps.branching.outputs.branch_name }}
 
-      - name: Create PR
+      - name: Create PR and Request Review
         if: ${{ !inputs.dry_run }}
         run: |
-          gh pr create \
-          --base "main" \
-          --title "Release ${{ inputs.version_number }}" \
-          --body "Release ${{ inputs.version_number }}. Please review and merge this PR to continue the release process." \
-          --reviewer "${{ github.actor }}"
+          # Create PR and capture the URL
+          PR_URL=$(gh pr create \
+            --base "main" \
+            --title "Release ${{ inputs.version_number }}" \
+            --body "Release ${{ inputs.version_number }}. Please review and merge this PR to continue the release process.")
+          
+          echo "Created PR: $PR_URL"
+          
+          # Extract PR number from URL
+          PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
+          
+          # Try to add reviewer - this may fail due to permissions but PR is already created
+          gh pr edit "$PR_NUMBER" --add-reviewer "${{ github.actor }}" || true
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
