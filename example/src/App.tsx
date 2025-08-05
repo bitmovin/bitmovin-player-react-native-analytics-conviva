@@ -17,11 +17,16 @@ import {
   AdSourceType,
 } from 'bitmovin-player-react-native';
 import validator from 'validator';
-import { useTVGestures } from '../hooks';
+import Constants from 'expo-constants';
+import { useTVGestures } from './hooks';
 import { ConvivaAnalytics } from 'bitmovin-player-react-native-analytics-conviva';
 
-const CONVIVA_CUSTOMER_KEY = 'YOUR-CONVIVA-CUSTOMER-KEY';
-const CONVIVA_GATEWAY_URL: string | undefined = undefined;
+const CONVIVA_CUSTOMER_KEY =
+  Constants.expoConfig?.extra?.convivaCustomerKey ||
+  process.env.EXPO_PUBLIC_CONVIVA_CUSTOMER_KEY;
+const CONVIVA_GATEWAY_URL =
+  Constants.expoConfig?.extra?.convivaGatewayUrl ||
+  process.env.EXPO_PUBLIC_CONVIVA_GATEWAY_URL;
 
 const withCorrelator = (tag: string): string =>
   `${tag}${Math.floor(Math.random() * 100000)}`;
@@ -178,18 +183,26 @@ export default function App() {
     const urlToLoad =
       assetUrlRef.current !== undefined && validator.isURL(assetUrlRef.current)
         ? assetUrlRef.current
-        : 'https://bitmovin-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8';
+        : 'https://cdn.bitmovin.com/content/internal/assets/MI201109210084/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8';
 
-    createConvivaAnalytics().then((newConvivaAnalytics) => {
-      newConvivaAnalytics.updateContentMetadata({
-        applicationName: 'Bitmovin iOS Conviva integration example app',
-        viewerId: 'awesomeViewerId',
-        custom: { custom_tag: 'Episode' },
-        additionalStandardTags: { 'c3.cm.contentType': 'VOD' },
+    createConvivaAnalytics()
+      .then((newConvivaAnalytics) => {
+        newConvivaAnalytics.updateContentMetadata({
+          applicationName: 'Bitmovin iOS Conviva integration example app',
+          viewerId: 'awesomeViewerId',
+          custom: { custom_tag: 'Episode' },
+          additionalStandardTags: { 'c3.cm.contentType': 'VOD' },
+        });
+        setConvivaAnalytics(newConvivaAnalytics);
+        loadAsset(urlToLoad);
+      })
+      .catch((error) => {
+        console.error(
+          `[ConvivaAnalytics] Error creating ConvivaAnalytics instance:`,
+          error
+        );
+        loadAsset(urlToLoad);
       });
-      setConvivaAnalytics(newConvivaAnalytics);
-      loadAsset(urlToLoad);
-    });
   }, [createConvivaAnalytics, loadAsset, player, setConvivaAnalytics]);
 
   const [adsEnabled, setAdsEnabled] = useState(true);
@@ -237,13 +250,20 @@ export default function App() {
 
   const startSession = useCallback(() => {
     setConvivaAnalytics(undefined);
-    createConvivaAnalytics().then((newConvivaAnalytics) => {
-      newConvivaAnalytics.updateContentMetadata({
-        assetName: 'Art of Motion',
+    createConvivaAnalytics()
+      .then((newConvivaAnalytics) => {
+        newConvivaAnalytics.updateContentMetadata({
+          assetName: 'Art of Motion',
+        });
+        newConvivaAnalytics.initializeSession();
+        setConvivaAnalytics(newConvivaAnalytics);
+      })
+      .catch((error) => {
+        console.error(
+          `[ConvivaAnalytics] Error starting Conviva session:`,
+          error
+        );
       });
-      newConvivaAnalytics.initializeSession();
-      setConvivaAnalytics(newConvivaAnalytics);
-    });
   }, [createConvivaAnalytics, setConvivaAnalytics]);
 
   const Container = Platform.isTV ? View : SafeAreaView;

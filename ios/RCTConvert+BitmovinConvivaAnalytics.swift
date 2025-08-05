@@ -15,7 +15,7 @@ extension RCTConvert {
         }
     }
 
-    static func metadataOverrides(_ json: NSDictionary) -> MetadataOverrides? {
+    static func metadataOverrides(_ json: [String: Any]) -> MetadataOverrides? {
         var metadataOverrides = MetadataOverrides()
         metadataOverrides.assetName = json["assetName"] as? String
         metadataOverrides.viewerId = json["viewerId"] as? String
