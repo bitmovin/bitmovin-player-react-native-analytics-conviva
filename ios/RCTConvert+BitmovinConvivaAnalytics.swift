@@ -4,7 +4,7 @@ import Foundation
 import React
 
 extension RCTConvert {
-    static func severity(_ json: String) -> ErrorSeverity? {
+    static func severity(_ json: String) -> ConvivaSDK.ErrorSeverity? {
         switch json {
         case "FATAL":
             return .ERROR_FATAL
