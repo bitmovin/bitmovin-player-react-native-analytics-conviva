@@ -110,7 +110,7 @@ const config: ExpoConfig = {
         playerLicenseKey: BITMOVIN_PLAYER_LICENSE_KEY,
       },
     ],
-    ['../app.plugin.js', { bitmovinConvivaIosVersion: '3.6.1' }],
+    ['../app.plugin.js', { bitmovinConvivaIosVersion: '3.6.2' }],
   ],
 };
 

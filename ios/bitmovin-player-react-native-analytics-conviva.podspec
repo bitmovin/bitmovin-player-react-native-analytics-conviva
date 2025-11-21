@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'ExpoModulesCore'
   s.dependency 'RNBitmovinPlayer'
-  s.dependency 'BitmovinConvivaAnalytics', '>= 3.6.1'
+  s.dependency 'BitmovinConvivaAnalytics', '>= 3.6.2'
 
   # Swift/Objective-C compatibility
   s.pod_target_xcconfig = {

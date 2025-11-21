@@ -27,7 +27,7 @@ import { BitmovinConvivaAnalyticsPluginProps } from './types';
  *     [
  *       'bitmovin-player-react-native-analytics-conviva',
  *       {
- *         bitmovinConvivaIosVersion: '3.6.1'
+ *         bitmovinConvivaIosVersion: '3.6.2'
  *       }
  *     ]
  *   ]
@@ -36,7 +36,7 @@ import { BitmovinConvivaAnalyticsPluginProps } from './types';
 export const withBitmovinConvivaAnalytics: ConfigPlugin<
   BitmovinConvivaAnalyticsPluginProps
 > = (config, props = {}) => {
-  const { bitmovinConvivaIosVersion = '3.6.1' } = props;
+  const { bitmovinConvivaIosVersion = '3.6.2' } = props;
 
   // Apply iOS modifications
   config = withConvivaAnalyticsIOS(config, {
