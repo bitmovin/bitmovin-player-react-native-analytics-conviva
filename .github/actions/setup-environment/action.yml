@@ -22,26 +22,34 @@ inputs:
     description: Setup Java and Gradle cache
     default: false
     required: false
+  tv:
+    description: Prebuild TV projects
+    default: false
+    required: false
+  skip-prebuild:
+    description: Skip smart prebuild steps (useful when restoring from cache first)
+    default: false
+    required: false
 
 runs:
   using: composite
   steps:
     - name: Set up Java
       if: ${{ inputs.java == 'true' }}
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
-        distribution: 'zulu'
+        distribution: 'temurin'
         java-version: '17'
 
     - name: Set up Gradle cache
       if: ${{ inputs.java == 'true' }}
-      uses: gradle/gradle-build-action@v2
+      uses: gradle/actions/setup-gradle@v4
       with:
         cache-read-only: ${{ github.ref != 'refs/heads/development' }}
 
     - name: Setup node and npm registry
       if: ${{ inputs.node == 'true' || inputs.subprojects == 'true' }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '20'
         registry-url: 'https://registry.npmjs.org/'
@@ -60,10 +68,18 @@ runs:
         cp example/.env.example example/.env
 
     - name: Generate native projects for mobile platforms
-      if: ${{ inputs.subprojects == 'true' }}
+      if: ${{ inputs.subprojects == 'true' && inputs.tv == 'false' && inputs['skip-prebuild'] != 'true' }}
       shell: bash
       run: |
-        yarn example prebuild --clean
+        .github/scripts/smart-prebuild.sh example
+      env:
+        NSUnbufferedIO: YES
+
+    - name: Generate native projects for TV platforms
+      if: ${{ inputs.subprojects == 'true' && inputs.tv == 'true' && inputs['skip-prebuild'] != 'true' }}
+      shell: bash
+      run: |
+        .github/scripts/smart-prebuild.sh example tv
       env:
         NSUnbufferedIO: YES
 
