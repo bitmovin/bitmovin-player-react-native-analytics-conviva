@@ -5,30 +5,62 @@ on:
     paths:
       - '.github/workflows/ci-ios-tvos.yml'
       - '.github/actions/**'
+      - '.github/scripts/**'
       - 'package.json'
       - 'yarn.lock'
       - 'ios/**'
       - 'ios/bitmovin-player-react-native-analytics-conviva.podspec'
       - '.swiftlint.yml'
+      - 'plugin/**'
+      - 'example/ios/**'
       - 'example/package.json'
       - 'example/yarn.lock'
+      - 'example/scripts/**'
+      - '**/Podfile*'
+      - '**/*.podspec'
+      - '**/*.xcodeproj/**'
+      - '**/*.xcworkspace/**'
+      - '**/Info.plist'
+      - '**/app.config.*'
+      - '**/expo.json'
+      - '**/build-ios.sh'
+      - '**/build-tvos.sh'
 
   push:
     branches: [development, development-v1]
     paths:
       - '.github/workflows/ci-ios-tvos.yml'
       - '.github/actions/**'
+      - '.github/scripts/**'
       - 'package.json'
       - 'yarn.lock'
       - 'ios/**'
       - 'ios/bitmovin-player-react-native-analytics-conviva.podspec'
       - '.swiftlint.yml'
+      - 'plugin/**'
+      - 'example/ios/**'
       - 'example/package.json'
       - 'example/yarn.lock'
+      - 'example/scripts/**'
+      - '**/Podfile*'
+      - '**/*.podspec'
+      - '**/*.xcodeproj/**'
+      - '**/*.xcworkspace/**'
+      - '**/Info.plist'
+      - '**/app.config.*'
+      - '**/expo.json'
+      - '**/build-ios.sh'
+      - '**/build-tvos.sh'
 
 concurrency:
   group: ci-ios-tvos-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+env:
+  NSUnbufferedIO: YES
+  IOS_DESTINATION: 'generic/platform=iOS Simulator'
+  TVOS_DESTINATION: 'generic/platform=tvOS Simulator'
+  XCODEBUILD_COMMON_FLAGS: '-parallelizeTargets -jobs 4 ONLY_ACTIVE_ARCH=YES ARCHS=x86_64 VALID_ARCHS=x86_64 DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO SWIFT_COMPILATION_MODE=wholemodule ENABLE_TESTABILITY=NO GCC_OPTIMIZATION_LEVEL=0 SWIFT_OPTIMIZATION_LEVEL=-Onone ENABLE_BITCODE=NO'
 
 jobs:
   code-style-ios:
@@ -54,17 +86,45 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Cache iOS Example Prebuild
+        id: ios-example-prebuild-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            example/ios
+          key: ${{ runner.os }}-ios-example-prebuild-${{ hashFiles('example/yarn.lock', 'example/app.json', 'plugin/**', 'ios/**') }}
+          restore-keys: |
+            ${{ runner.os }}-ios-example-prebuild-
+
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
         with:
           node: true
           subprojects: true
           ios: true
+          skip-prebuild: true
+
+      - name: Prebuild iOS example (on cache miss)
+        if: ${{ steps.ios-example-prebuild-cache.outputs.cache-hit != 'true' }}
+        run: .github/scripts/smart-prebuild.sh example
+
+      - name: Cache CocoaPods Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/CocoaPods
+            example/ios/Pods
+          key: ${{ runner.os }}-ios-example-pods-${{ hashFiles('ios/bitmovin-player-react-native-analytics-conviva.podspec', 'example/ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-ios-example-pods-
+
+      - name: Install CocoaPods Dependencies
+        run: yarn example pods
 
       - name: Build iOS example
         run: yarn example build:ios --renderer github-actions
         env:
-          NSUnbufferedIO: YES
+          XCODEBUILD_ARGS: "-destination '${{ env.IOS_DESTINATION }}' ${{ env.XCODEBUILD_COMMON_FLAGS }}"
 
   test-build-tvos:
     name: Build tvOS Example App
@@ -73,19 +133,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Cache tvOS Prebuild
+        id: tvos-prebuild-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            example/ios
+          key: ${{ runner.os }}-tvos-prebuild-${{ hashFiles('example/yarn.lock', 'example/app.json', 'plugin/**', 'ios/**') }}
+          restore-keys: |
+            ${{ runner.os }}-tvos-prebuild-
+
+      - name: Cache CocoaPods Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/CocoaPods
+            example/ios/Pods
+          key: ${{ runner.os }}-tvos-pods-${{ hashFiles('ios/bitmovin-player-react-native-analytics-conviva.podspec', 'example/ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-tvos-pods-
+
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
         with:
           node: true
           subprojects: true
           ios: true
+          tv: true
+          skip-prebuild: true
 
-      - name: Prebuild tvOS example
-        run: yarn example prebuild:tv --clean
-        env:
-          NSUnbufferedIO: YES
+      - name: Prebuild tvOS example (on cache miss)
+        if: ${{ steps.tvos-prebuild-cache.outputs.cache-hit != 'true' }}
+        run: .github/scripts/smart-prebuild.sh example tv
 
       - name: Build tvOS example
         run: yarn example build:tvos --renderer github-actions
         env:
-          NSUnbufferedIO: YES
+          XCODEBUILD_ARGS: "-destination '${{ env.TVOS_DESTINATION }}' ${{ env.XCODEBUILD_COMMON_FLAGS }}"
