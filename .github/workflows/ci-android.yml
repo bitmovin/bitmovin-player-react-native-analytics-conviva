@@ -5,26 +5,51 @@ on:
     paths:
       - '.github/workflows/ci-android.yml'
       - '.github/actions/**'
+      - '.github/scripts/**'
       - 'package.json'
       - 'yarn.lock'
+      - 'plugin/**'
       - 'android/**'
+      - 'example/android/**'
       - 'example/package.json'
       - 'example/yarn.lock'
+      - 'example/scripts/**'
+      - '**/app.config.*'
+      - '**/expo.json'
+      - '**/*.gradle*'
+      - '**/gradle.properties'
+      - '**/gradle-wrapper.properties'
+      - '**/gradle/**'
+      - '**/gradlew*'
 
   push:
     branches: [development, development-v1]
     paths:
       - '.github/workflows/ci-android.yml'
       - '.github/actions/**'
+      - '.github/scripts/**'
       - 'package.json'
       - 'yarn.lock'
+      - 'plugin/**'
       - 'android/**'
+      - 'example/android/**'
       - 'example/package.json'
       - 'example/yarn.lock'
+      - 'example/scripts/**'
+      - '**/app.config.*'
+      - '**/expo.json'
+      - '**/*.gradle*'
+      - '**/gradle.properties'
+      - '**/gradle-wrapper.properties'
+      - '**/gradle/**'
+      - '**/gradlew*'
 
 concurrency:
   group: ci-android-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+env:
+  GRADLE_USER_HOME: ${{ github.workspace }}/.gradle-ci
 
 jobs:
   code-style-android:
@@ -49,15 +74,66 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Cache Android Prebuild
+        id: android-prebuild-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            example/android
+          key: ${{ runner.os }}-android-prebuild-${{ hashFiles('example/yarn.lock', 'example/app.json', 'plugin/**', 'android/**') }}
+          restore-keys: |
+            ${{ runner.os }}-android-prebuild-
+
+      - name: Setup Gradle Build Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ${{ github.workspace }}/.gradle-ci
+            example/android/.gradle
+            example/android/app/build
+            example/android/build
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'example/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
         with:
           java: true
           node: true
           subprojects: true
+          skip-prebuild: true
+
+      - name: Prebuild Android Example (on cache miss)
+        if: ${{ steps.android-prebuild-cache.outputs.cache-hit != 'true' }}
+        run: .github/scripts/smart-prebuild.sh example
 
       - name: Build Android example
-        run: yarn example build:android --build-cache
+        id: build
+        run: |
+          START_TIME=$(date +%s)
+          cd example/android
+          ./gradlew assembleDebug --quiet --console=plain \
+            --build-cache --parallel --max-workers=4 --no-daemon \
+            --no-configuration-cache \
+            -PreactNativeArchitectures=x86,x86_64
+          END_TIME=$(date +%s)
+          echo "duration=$((END_TIME - START_TIME))" >> $GITHUB_OUTPUT
+
+      - name: Report build time
+        run: echo "✅ Build completed in ${{ steps.build.outputs.duration }} seconds"
+
+      - name: Upload build cache artifacts
+        if: success()
+        uses: actions/upload-artifact@v5
+        with:
+          name: android-example-build-cache
+          path: |
+            ~/.gradle/caches/build-cache-*
+            example/android/app/build/intermediates
+          retention-days: 1
 
   test-build-android-tv:
     name: Build Android TV
@@ -66,15 +142,65 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Cache Android TV Prebuild
+        id: android-tv-prebuild-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            example/android
+          key: ${{ runner.os }}-android-tv-prebuild-${{ hashFiles('example/yarn.lock', 'example/app.json', 'plugin/**', 'android/**') }}
+          restore-keys: |
+            ${{ runner.os }}-android-tv-prebuild-
+
+      - name: Setup Gradle Build Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ${{ github.workspace }}/.gradle-ci
+            example/android/.gradle
+            example/android/app/build
+            example/android/build
+          key: ${{ runner.os }}-gradle-tv-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'example/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-tv-
+            ${{ runner.os }}-gradle-
+
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
         with:
           java: true
           node: true
           subprojects: true
+          tv: true
+          skip-prebuild: true
 
       - name: Prebuild Android TV example
-        run: yarn example prebuild:tv --clean
+        if: ${{ steps.android-tv-prebuild-cache.outputs.cache-hit != 'true' }}
+        run: .github/scripts/smart-prebuild.sh example tv
 
       - name: Build Android TV example
-        run: yarn example build:android-tv --build-cache
+        id: build
+        run: |
+          START_TIME=$(date +%s)
+          cd example/android
+          ./gradlew assembleDebug --quiet --console=plain \
+            --build-cache --parallel --max-workers=4 --no-daemon \
+            --no-configuration-cache \
+            -PreactNativeArchitectures=x86,x86_64
+          END_TIME=$(date +%s)
+          echo "duration=$((END_TIME - START_TIME))" >> $GITHUB_OUTPUT
+
+      - name: Report build time
+        run: echo "✅ Build completed in ${{ steps.build.outputs.duration }} seconds"
+
+      - name: Upload build cache artifacts
+        if: success()
+        uses: actions/upload-artifact@v5
+        with:
+          name: android-tv-build-cache
+          path: |
+            ~/.gradle/caches/build-cache-*
+            example/android/app/build/intermediates
+          retention-days: 1

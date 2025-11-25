@@ -57,7 +57,7 @@ export default {
     [
       'bitmovin-player-react-native-analytics-conviva',
       {
-        convivaAnalyticsVersion: '3.6.1', // Optional, defaults to 3.6.1
+        convivaAnalyticsVersion: '3.6.2', // Optional, defaults to 3.6.2
       },
     ],
   ],
@@ -67,7 +67,7 @@ export default {
 The plugin will automatically:
 
 - Add the BitmovinConvivaAnalytics pod with Git source and tag
-- Ensure version compatibility (minimum 3.6.1)
+- Ensure version compatibility (minimum 3.6.2)
 - Handle Podfile modifications during `expo prebuild`
 
 #### Option 2: Manual Installation
@@ -84,7 +84,7 @@ source 'https://github.com/bitmovin/cocoapod-specs.git'
 Then add the following line to your desired target:
 
 ```ruby
-pod 'BitmovinConvivaAnalytics', git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git', tag: '3.6.1'
+pod 'BitmovinConvivaAnalytics', git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git', tag: '3.6.2'
 ```
 
 Then, in your command line run in your `ios` folder:
@@ -302,7 +302,7 @@ export default {
             {
               name: 'BitmovinConvivaAnalytics',
               git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git',
-              tag: '3.6.1',
+              tag: '3.6.2',
             },
           ],
         },
@@ -332,7 +332,7 @@ export default {
     [
       'bitmovin-player-react-native-analytics-conviva',
       {
-        convivaAnalyticsVersion: '3.6.1', // Optional
+        convivaAnalyticsVersion: '3.6.2', // Optional
       },
     ],
   ],
@@ -345,4 +345,4 @@ The Expo config plugin supports the following options:
 
 | Option                    | Type   | Default | Description                                                   |
 | ------------------------- | ------ | ------- | ------------------------------------------------------------- |
-| `convivaAnalyticsVersion` | string | "3.6.1" | Version of BitmovinConvivaAnalytics iOS pod. Must be >= 3.6.1 |
+| `convivaAnalyticsVersion` | string | "3.6.2" | Version of BitmovinConvivaAnalytics iOS pod. Must be >= 3.6.2 |
