@@ -45,7 +45,7 @@
     "expo-system-ui": "~5.0.10",
     "react": "19.0.0",
     "react-native": "npm:react-native-tvos@0.79.5-0",
-    "validator": "^13.12.0"
+    "validator": "^13.15.22"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
