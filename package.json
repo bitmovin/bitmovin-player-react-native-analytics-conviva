@@ -43,7 +43,7 @@
     "format:android": "./scripts/format-android.sh",
     "format:all": "yarn format && yarn format:ios && yarn format:android",
     "lint:all": "yarn lint && yarn example lint && yarn lint:ios && yarn lint:android",
-    "lint:ios": "swiftlint ios --strict --quiet",
+    "lint:ios": "swiftlint lint --no-cache ios --strict --quiet",
     "lint:android": "cd android && ./gradlew -b ktlint.gradle ktlintCheck --quiet --console=plain",
     "setup-hooks": "./scripts/setup-hooks.sh",
     "example": "yarn --cwd example",
@@ -52,8 +52,10 @@
     "example:tvos": "yarn example run:tvos",
     "example:android-tv": "yarn example run:android-tv",
     "pods": "yarn example pods",
-    "bootstrap": "yarn install && yarn brew && yarn build && yarn example bootstrap && yarn setup-hooks",
-    "brew": "[ \"$(uname)\" != Darwin ] || brew bundle install"
+    "bootstrap": "yarn install && yarn build:player && yarn brew && yarn build && yarn example bootstrap && yarn setup-hooks",
+    "brew": "[ \"$(uname)\" != Darwin ] || brew bundle install",
+    "test": "node --test scripts/test-*.js",
+    "build:player": "tsc -p node_modules/bitmovin-player-react-native/tsconfig.json && tsc -p node_modules/bitmovin-player-react-native/plugin/tsconfig.json"
   },
   "keywords": [
     "react-native",
@@ -84,35 +86,31 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@expo/config-plugins": "~10.1.2",
-    "expo-build-properties": "~0.14.8"
+    "@expo/config-plugins": "~57.0.10"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",
     "@types/node": "^24.1.0",
-    "@types/react": "~19.0.10",
+    "@types/react": "~19.2.4",
     "@types/semver": "^7.7.0",
-    "bitmovin-player-react-native": "1.0.0",
+    "bitmovin-player-react-native": "github:bitmovin/bitmovin-player-react-native#7a46d45ff6beee11e28aabfaa8db9919f1c93eff",
     "eslint": "^8.57.0",
-    "eslint-config-expo": "~9.2.0",
+    "eslint-config-expo": "~57.0.2",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.5.1",
-    "expo": "53.0.20",
-    "expo-module-scripts": "^4.1.9",
+    "expo": "~57.0.30",
+    "expo-module-scripts": "^56.0.3",
     "lint-staged": "13.0.3",
     "prettier": "^3.6.2",
-    "react": "19.0.0",
-    "react-native": "0.79.5",
-    "typedoc": "^0.28.7",
-    "typescript": "~5.8.3"
-  },
-  "resolutions": {
-    "@types/react": "^18.2.44"
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "typedoc": "^0.28.20",
+    "typescript": "~6.0.3",
+    "expo-crypto": "~57.0.4"
   },
   "peerDependencies": {
-    "bitmovin-player-react-native": ">=1.0.0",
-    "expo": ">=53.0.0",
-    "expo-crypto": ">=14.0.0",
+    "bitmovin-player-react-native": ">=1.30.0",
+    "expo": ">=57.0.0",
     "react": "*",
     "react-native": "*"
   },

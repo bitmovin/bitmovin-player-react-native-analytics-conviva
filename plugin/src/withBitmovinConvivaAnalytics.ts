@@ -1,47 +1,19 @@
-import { ConfigPlugin } from 'expo/config-plugins';
+import type { ConfigPlugin } from 'expo/config-plugins';
 import { withConvivaAnalyticsIOS } from './withConvivaAnalyticsIOS';
-import { BitmovinConvivaAnalyticsPluginProps } from './types';
+import type { BitmovinConvivaAnalyticsPluginProps } from './types';
 
-/**
- * Expo Config Plugin for BitmovinConvivaAnalytics
- *
- * Automatically configures iOS BitmovinConvivaAnalytics pod dependency with version validation.
- * Android dependencies are handled via gradle and don't require plugin configuration.
- *
- * @param config - The Expo config object
- * @param props - Plugin configuration options
- * @returns Modified Expo config with iOS pod configuration
- *
- * @example
- * // app.config.js
- * module.exports = {
- *   plugins: [
- *     'bitmovin-player-react-native-analytics-conviva'
- *   ]
- * };
- *
- * @example
- * // app.config.js
- * module.exports = {
- *   plugins: [
- *     [
- *       'bitmovin-player-react-native-analytics-conviva',
- *       {
- *         bitmovinConvivaIosVersion: '3.6.2'
- *       }
- *     ]
- *   ]
- * };
- */
+/** Configure the native Conviva Swift package used alongside the Player package. */
 export const withBitmovinConvivaAnalytics: ConfigPlugin<
   BitmovinConvivaAnalyticsPluginProps
 > = (config, props = {}) => {
-  const { bitmovinConvivaIosVersion = '3.6.2' } = props;
-
-  // Apply iOS modifications
-  config = withConvivaAnalyticsIOS(config, {
-    version: bitmovinConvivaIosVersion,
-  });
-
-  return config;
+  const {
+    bitmovinConvivaIosVersion: version,
+    bitmovinConvivaIosRevision: revision,
+  } = props;
+  if (version && revision) {
+    throw new Error(
+      'Choose either bitmovinConvivaIosVersion or bitmovinConvivaIosRevision.'
+    );
+  }
+  return withConvivaAnalyticsIOS(config, { version, revision });
 };

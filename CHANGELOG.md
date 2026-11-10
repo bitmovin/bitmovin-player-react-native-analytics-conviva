@@ -1,5 +1,19 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Use Expo SharedObjects for Conviva, Player attachment, and SSAI. Keep deprecated `nativeId` aliases in JavaScript only.
+- Share one native creation attempt across initialization and commands, retain attached Player owners, and release unreachable integrations automatically.
+- Require the SharedObject-based Player bindings and Expo SDK 57+.
+- iOS: Link BitmovinConvivaAnalytics through SPM at a compatible revision and raise the minimum deployment target to 16.4.
+
+### Breaking Changes
+
+- Conviva commands return promises. `release()` and `destroy()` end the instance lifetime; create a new instance to track again.
+- SSAI helpers accept an internal SharedObject creation promise instead of a native ID. Use `convivaAnalytics.ssai`.
+
 ## [2.0.0] - 2025-08-05
 
 ### Breaking Change

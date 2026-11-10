@@ -1,0 +1,7 @@
+{
+  "conviva": {
+    "url": "https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git",
+    "revision": "e6f924771c5412ccfb4732c8bda4e1ec34bcf7a8",
+    "product": "BitmovinConvivaAnalytics"
+  }
+}

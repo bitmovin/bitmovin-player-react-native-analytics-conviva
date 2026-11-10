@@ -19,7 +19,7 @@ extension RCTConvert {
         var metadataOverrides = MetadataOverrides()
         metadataOverrides.assetName = json["assetName"] as? String
         metadataOverrides.viewerId = json["viewerId"] as? String
-        metadataOverrides.streamType = RCTConvert.streamType(json["streamType"] as? String)
+        metadataOverrides.streamType = Self.streamType(json["streamType"] as? String)
         metadataOverrides.applicationName = json["applicationName"] as? String
         metadataOverrides.custom = json["custom"] as? [String: Any]
         metadataOverrides.duration = (json["duration"] as? NSNumber)?.intValue
@@ -50,7 +50,7 @@ extension RCTConvert {
             duration: json["duration"] as? Double,
             id: json["id"] as? String,
             adSystem: json["adSystem"] as? String,
-            position: RCTConvert.adPosition(json["position"] as? String),
+            position: Self.adPosition(json["position"] as? String),
             isSlate: json["isSlate"] as? Bool ?? false,
             adStitcher: json["adStitcher"] as? String,
             additionalMetadata: json["additionalMetadata"] as? [String: Any]

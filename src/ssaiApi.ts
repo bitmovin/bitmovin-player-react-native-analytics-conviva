@@ -1,3 +1,4 @@
+import type { NativeConviva } from './modules/BitmovinPlayerReactNativeAnalyticsConvivaModule';
 import BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule from './modules/BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule';
 
 export enum SsaiAdPosition {
@@ -48,27 +49,18 @@ export interface SsaiAdInfo {
 
 /**
  * Enables reporting of server-side ad breaks and ads.
- * @platform Android, iOS, tvOS
  */
 export class SsaiApi {
-  /**
-   * The native conviva analytics id that this SSAI API is attached to.
-   */
-  readonly nativeId: string;
-
-  constructor(nativeId: string) {
-    this.nativeId = nativeId;
-  }
+  /** @internal */
+  constructor(private readonly native: Promise<NativeConviva>) {}
 
   /**
    * Reports if a server-side ad break is currently active.
    * @returns true if an ad break is currently active, false otherwise
-   *
-   * @platform Android, iOS, tvOS
    */
   isAdBreakActive = async (): Promise<boolean> => {
     return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.isAdBreakActive(
-      this.nativeId
+      await this.native
     );
   };
 
@@ -76,14 +68,12 @@ export class SsaiApi {
    * Reports the start of a server-side ad break. Must be called before the first ad starts.
    * Has no effect if a server-side ad break is already playing.
    * @param adBreakInfo Map containing metadata about the server-side ad break. Can be `undefined`.
-   *
-   * @platform Android, iOS, tvOS
    */
   reportAdBreakStarted = async (
     adBreakInfo: { [key: string]: any } | undefined = undefined
   ): Promise<void> => {
     return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdBreakStarted(
-      this.nativeId,
+      await this.native,
       adBreakInfo
     );
   };
@@ -91,12 +81,10 @@ export class SsaiApi {
   /**
    * Reports the end of a server-side ad break. Must be called after the last ad has finished.
    * Has no effect if no server-side ad break is currently active.
-   *
-   * @platform Android, iOS, tvOS
    */
   reportAdBreakFinished = async (): Promise<void> => {
     return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdBreakFinished(
-      this.nativeId
+      await this.native
     );
   };
 
@@ -106,11 +94,10 @@ export class SsaiApi {
    * Has to be called after calling the `reportAdBreakStarted()` method.
    *
    * @param adInfo {@link SsaiAdInfo} containing metadata about the server-side ad.
-   * @platform Android, iOS, tvOS
    */
   reportAdStarted = async (adInfo: SsaiAdInfo): Promise<void> => {
     return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdStarted(
-      this.nativeId,
+      await this.native,
       adInfo
     );
   };
@@ -118,24 +105,20 @@ export class SsaiApi {
   /**
    * Reports the end of a server-side ad.
    * Has no effect if no server-side ad is currently playing.
-   *
-   * @platform Android, iOS, tvOS
    */
   reportAdFinished = async (): Promise<void> => {
     return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdFinished(
-      this.nativeId
+      await this.native
     );
   };
 
   /**
    * Reports that the current ad was skipped.
    * Has no effect if no server-side ad is playing.
-   *
-   * @platform Android, iOS, tvOS
    */
   reportAdSkipped = async (): Promise<void> => {
     return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.reportAdSkipped(
-      this.nativeId
+      await this.native
     );
   };
 
@@ -144,11 +127,10 @@ export class SsaiApi {
    * Has no effect if no server-side ad is playing.
    *
    * @param adInfo Object containing metadata about the ad.
-   * @platform Android, iOS, tvOS
    */
   updateAdInfo = async (adInfo: SsaiAdInfo): Promise<void> => {
-    BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.updateAdInfo(
-      this.nativeId,
+    return BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule.updateAdInfo(
+      await this.native,
       adInfo
     );
   };

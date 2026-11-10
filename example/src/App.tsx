@@ -74,26 +74,26 @@ const advertisingConfig = {
   ],
 };
 
+function createPlayerWithAds(adsEnabled: boolean): Player {
+  return new Player({
+    playbackConfig: { isAutoplayEnabled: true, isMuted: true },
+    advertisingConfig: adsEnabled ? advertisingConfig : undefined,
+  });
+}
+
 export default function App() {
   useTVGestures();
 
   const adsEnabledRef = useRef(true);
   const assetUrlRef = useRef<string | undefined>(undefined);
   const createPlayer = useCallback(
-    () =>
-      new Player({
-        playbackConfig: {
-          isAutoplayEnabled: true,
-          isMuted: true,
-        },
-        advertisingConfig: adsEnabledRef.current
-          ? advertisingConfig
-          : undefined,
-      }),
+    () => createPlayerWithAds(adsEnabledRef.current),
     []
   );
 
-  const [player, _setPlayer] = useState<Player | undefined>(createPlayer());
+  const [player, _setPlayer] = useState<Player | undefined>(() =>
+    createPlayerWithAds(true)
+  );
   const setPlayer = useCallback(
     (newPlayer: Player | undefined) => {
       playerRef.current = newPlayer;
@@ -124,12 +124,12 @@ export default function App() {
     useCallback(async (): Promise<ConvivaAnalytics> => {
       if (convivaAnalyticsRef.current !== undefined) {
         if (playerRef.current !== undefined) {
-          convivaAnalyticsRef.current.attachPlayer(playerRef.current as any);
+          await convivaAnalyticsRef.current.attachPlayer(playerRef.current);
         }
         return convivaAnalyticsRef.current;
       } else {
         const newConvivaAnalytics = new ConvivaAnalytics({
-          player: playerRef.current as any,
+          player: playerRef.current,
           customerKey: CONVIVA_CUSTOMER_KEY,
           debugLoggingEnabled: true,
           gatewayUrl: CONVIVA_GATEWAY_URL,
