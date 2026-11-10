@@ -109,10 +109,17 @@
     "expo-crypto": "~57.0.4"
   },
   "peerDependencies": {
-    "bitmovin-player-react-native": ">=1.30.0",
+    "bitmovin-player-react-native": ">1.30.0",
     "expo": ">=57.0.0",
     "react": "*",
     "react-native": "*"
+  },
+  "bitmovinCompatibility": {
+    "player": {
+      "status": "unreleased",
+      "notice": "Requires the upcoming React Native Player release containing PR #1167. Currently released Player versions (1.30.0 and earlier) are incompatible. Finalize the minimum supported release version before publishing.",
+      "requiredPullRequest": "https://github.com/bitmovin/bitmovin-player-react-native/pull/1167"
+    }
   },
   "lint-staged": {
     "src/**/*.(ts|tsx)": "eslint --quiet",

@@ -6,7 +6,7 @@
 
 - Use Expo SharedObjects for Conviva, Player attachment, and SSAI. Keep deprecated `nativeId` aliases in JavaScript only.
 - Share one native creation attempt across initialization and commands, retain attached Player owners, and release unreachable integrations automatically.
-- Require the SharedObject-based Player bindings and Expo SDK 57+.
+- Require the upcoming React Native Player release containing SharedObjects support (#1167) and Expo SDK 57+. Currently released Player versions (`1.30.0` and earlier) are incompatible.
 - iOS: Link BitmovinConvivaAnalytics through SPM at a compatible revision and raise the minimum deployment target to 16.4.
 
 ### Breaking Changes

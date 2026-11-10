@@ -2,6 +2,12 @@
 
 This is an open-source project to enable the use of a third-party component (Conviva) with the Bitmovin Player React Native SDK.
 
+> **Compatibility:** This version targets the upcoming React Native Player release
+> containing [SharedObjects support (#1167)](https://github.com/bitmovin/bitmovin-player-react-native/pull/1167).
+> It is incompatible with currently released Player versions (`1.30.0` and earlier).
+> Until that release is available, use the pinned development revision. The exact
+> minimum supported release version must be set before publishing this integration.
+
 ## Maintenance and Update
 
 This project is not part of a regular maintenance or update schedule and is updated once yearly to conform with the latest product versions. For additional update requests, please take a look at the guidance further below.
@@ -43,9 +49,8 @@ yarn add bitmovin-player-react-native-analytics-conviva
 ```
 
 This branch requires the SharedObject-based Player bindings, Expo SDK 57+, and iOS/tvOS 16.4+.
-The development dependencies and example pin the compatible Player revision. Existing
-Player releases without SharedObjects are incompatible even if they satisfy the npm
-peer version range.
+The development dependencies and example pin the compatible unreleased Player revision.
+The peer range excludes current releases; the future release must also contain #1167.
 
 ### iOS
 
@@ -94,7 +99,7 @@ For more information about permissions and collected network types please look a
 
 ### Compatibility
 
-This branch requires the SharedObject-based Player bindings and Expo SDK 57+. The pinned development dependency identifies the compatible Player revision.
+This version requires the upcoming React Native Player release containing #1167 and Expo SDK 57+. Player `1.30.0` and earlier are incompatible. The pinned development dependency identifies the compatible unreleased revision.
 
 ## Usage
 
