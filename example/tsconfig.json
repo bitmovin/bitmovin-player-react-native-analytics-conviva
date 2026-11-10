@@ -4,7 +4,10 @@
     "strict": true,
     "paths": {
       "bitmovin-player-react-native-analytics-conviva": ["../src/index"],
-      "bitmovin-player-react-native-analytics-conviva/*": ["../src/*"]
+      "bitmovin-player-react-native-analytics-conviva/*": ["../src/*"],
+      "bitmovin-player-react-native": [
+        "./node_modules/bitmovin-player-react-native/build/index"
+      ]
     }
   }
 }

@@ -8,11 +8,27 @@ This example app is now completely independent and uses Expo autolinking to reso
 
 ### Prerequisites
 
-- Node.js >= 18
+- Node.js 24
 - Expo CLI: `npm install -g @expo/cli`
 - iOS: Xcode and iOS Simulator
 - Android: Android Studio and Android SDK
 - For TV: Apple TV Simulator (included in Xcode) or Android TV emulator
+
+### Install the pinned Player bindings
+
+From the repository root:
+
+```sh
+yarn install
+yarn build:player
+yarn build
+yarn example install
+yarn example build:player
+```
+
+The development Player dependency is pinned to the compatible SharedObject revision.
+Git dependencies need a local TypeScript build after installation. Run `build:player`
+again if reinstalling dependencies replaces that build output.
 
 ### Environment Setup
 
@@ -89,11 +105,27 @@ yarn example ios:tv                 # Run on Apple TV simulator
 yarn example android:tv            # Run on Android TV emulator
 ```
 
+### SharedObject smoke check
+
+Build the example, then start Metro with `EXPO_PUBLIC_SHARED_OBJECT_SMOKE=1` and
+open the development build. The test screen must show `SharedObject smoke passed`.
+It covers real native creation, concurrent initialization, configured and late
+Player attachment, source load/unload submission, SSAI ad-break state transitions, commands after release, repeated
+release, and destruction during initialization.
+
+```sh
+EXPO_PUBLIC_SHARED_OBJECT_SMOKE=1 yarn example start --dev-client
+```
+
+The smoke uses a dummy Conviva key. It does not validate playback, garbage
+collection cleanup, ad metric submission, network delivery, or Touchstone certification. Run it on each
+platform being validated; an Android pass does not cover iOS/tvOS.
+
 ### Platform-Specific Notes
 
 **iOS/tvOS Development:**
 
-- Requires Xcode 15+ and iOS/tvOS 15.1+ deployment target
+- Requires Xcode 26.6 and iOS/tvOS 16.4+ deployment target
 - Uses `xcbeautify` for cleaner build output
 
 **Android/Android TV Development:**

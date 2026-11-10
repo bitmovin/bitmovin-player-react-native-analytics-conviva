@@ -55,15 +55,15 @@ jobs:
       - name: Setup node and npm registry
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org/'
           cache: 'yarn'
 
       - name: Install node_modules
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile && yarn build:player
 
       - name: Install node_modules (example/)
-        run: yarn install --frozen-lockfile --cwd example
+        run: yarn install --frozen-lockfile --cwd example && yarn example build:player
 
       - name: Lint Typescript
         run: yarn lint
@@ -78,18 +78,21 @@ jobs:
       - name: Setup node and npm registry
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org/'
           cache: 'yarn'
 
       - name: Install node_modules
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile && yarn build:player
 
       - name: Install node_modules (example/)
-        run: yarn install --frozen-lockfile --cwd example
+        run: yarn install --frozen-lockfile --cwd example && yarn example build:player
 
       - name: Typecheck TypeScript
         run: yarn typecheck:all
+
+      - name: Test JS orchestration
+        run: yarn test
 
       - name: Build TypeScript (Module)
         run: yarn build:module

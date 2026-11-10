@@ -52,11 +52,6 @@ const config: ExpoConfig = {
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
-  splash: {
-    image: './assets/splash-icon.png',
-    resizeMode: 'contain',
-    backgroundColor: '#1EABE3',
-  },
   ios: {
     supportsTablet: true,
     bundleIdentifier:
@@ -81,6 +76,10 @@ const config: ExpoConfig = {
   },
   plugins: [
     [
+      'expo-splash-screen',
+      { image: './assets/splash-icon.png', backgroundColor: '#1EABE3' },
+    ],
+    [
       '@react-native-tvos/config-tv',
       {
         androidTVBanner: './assets/android-tv-banner.png',
@@ -98,19 +97,17 @@ const config: ExpoConfig = {
     [
       'expo-build-properties',
       {
-        android: { buildToolsVersion: '35.0.0' },
-        ios: {
-          flipper: false,
-        },
+        android: { compileSdkVersion: 37 },
       },
     ],
     [
       'bitmovin-player-react-native',
       {
         playerLicenseKey: BITMOVIN_PLAYER_LICENSE_KEY,
+        features: { googleIMA: true },
       },
     ],
-    ['../app.plugin.js', { bitmovinConvivaIosVersion: '3.6.2' }],
+    '../app.plugin.js',
   ],
 };
 

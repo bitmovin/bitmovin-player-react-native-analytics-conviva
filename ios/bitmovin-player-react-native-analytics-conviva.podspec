@@ -20,8 +20,8 @@ Pod::Spec.new do |s|
   s.author         = package['author']
   s.homepage       = package['homepage']
   s.platforms      = {
-    :ios => '15.1',
-    :tvos => '15.1'
+    :ios => '16.4',
+    :tvos => '16.4'
   }
   s.swift_version  = '5.10'
   s.source         = { git: 'https://github.com/bitmovin/bitmovin-player-react-native-analytics-conviva', :tag => "v#{s.version}" }
@@ -29,7 +29,23 @@ Pod::Spec.new do |s|
 
   s.dependency 'ExpoModulesCore'
   s.dependency 'RNBitmovinPlayer'
-  s.dependency 'BitmovinConvivaAnalytics', '>= 3.6.2'
+  unless respond_to?(:spm_dependency, true)
+    raise 'Conviva Analytics requires React Native with spm_dependency support.'
+  end
+  dependency = JSON.parse(File.read(File.join(__dir__, 'dependencies.json'))).fetch('conviva')
+  conviva_version = podfile_properties['BITMOVIN_CONVIVA_IOS_VERSION']
+  requirement = if conviva_version
+    { kind: 'exactVersion', version: conviva_version }
+  else
+    revision = podfile_properties.fetch('BITMOVIN_CONVIVA_IOS_REVISION', dependency.fetch('revision'))
+    { kind: 'revision', revision: revision }
+  end
+  spm_dependency(
+    s,
+    url: dependency.fetch('url'),
+    requirement: requirement,
+    products: [dependency.fetch('product')]
+  )
 
   # Swift/Objective-C compatibility
   s.pod_target_xcconfig = {

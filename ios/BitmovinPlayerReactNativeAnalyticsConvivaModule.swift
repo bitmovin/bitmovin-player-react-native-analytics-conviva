@@ -1,29 +1,17 @@
 import BitmovinConvivaAnalytics
-import BitmovinPlayerCore
+import BitmovinPlayer
 import ExpoModulesCore
+import React
 import RNBitmovinPlayer
 
 public class BitmovinPlayerReactNativeAnalyticsConvivaModule: Module { // swiftlint:disable:this type_name
-    private var convivaAnalyticsInstances: Registry<ConvivaAnalytics> = [:]
-
-    // swiftlint:disable:next function_body_length cyclomatic_complexity
+    // swiftlint:disable:next function_body_length
     public func definition() -> ModuleDefinition {
         Name("BitmovinPlayerReactNativeAnalyticsConviva")
 
-        AsyncFunction("initWithConfig") { (nativeId: NativeId, playerNativeId: NativeId?, customerKey: String, gatewayUrl: String?, debugLoggingEnabled: Bool) in // swiftlint:disable:this line_length
-            let player: Player?
-            if let playerNativeId {
-                guard let playerByNativeId = PlayerRegistry.getPlayer(nativeId: playerNativeId) else {
-                    throw Exception(
-                        name: "PlayerNotFound",
-                        description: "Could not retrieve Player with native Id \(playerNativeId)"
-                    )
-                }
-                player = playerByNativeId
-            } else {
-                player = nil
-            }
+        Class(SharedConviva.self) {}
 
+        AsyncFunction("create") { (player: SharedPlayer?, customerKey: String, gatewayUrl: String?, debugLoggingEnabled: Bool) -> SharedConviva in // swiftlint:disable:this line_length
             let convivaConfig = ConvivaConfiguration()
             if let gatewayUrl {
                 if let gatewayUrlValue = URL(string: gatewayUrl) {
@@ -42,97 +30,54 @@ public class BitmovinPlayerReactNativeAnalyticsConvivaModule: Module { // swiftl
 
             do {
                 let convivaAnalytics = try ConvivaAnalytics(
-                    player: player,
+                    player: player?.player,
                     customerKey: customerKey,
                     config: convivaConfig
                 )
-                self.convivaAnalyticsInstances[nativeId] = convivaAnalytics
+                return SharedConviva(analytics: convivaAnalytics, player: player)
             } catch {
                 throw Exception(
                     name: "InitializationFailed",
-                    description: """
-                    Could not initialize Conviva Analytics with native Id \(nativeId) \
-                    using playerNativeId \(playerNativeId ?? "nil") \
-                    and customerKey \(customerKey): \(error.localizedDescription)
-                    """
+                    description: "Could not initialize Conviva Analytics: \(error.localizedDescription)"
                 )
             }
         }
         .runOnQueue(.main)
 
-        AsyncFunction("attachPlayer") { (nativeId: NativeId, playerNativeId: NativeId) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
-            guard let player = PlayerRegistry.getPlayer(nativeId: playerNativeId) else {
-                throw Exception(
-                    name: "PlayerNotFound",
-                    description: "Could not retrieve Player with native Id \(playerNativeId)"
-                )
-            }
-            conviva.attach(player: player)
+        AsyncFunction("attachPlayer") { (owner: SharedConviva, player: SharedPlayer) -> Bool in
+            try owner.attach(player)
         }
         .runOnQueue(.main)
 
-        AsyncFunction("destroy") { (nativeId: NativeId) in
-            self.convivaAnalyticsInstances[nativeId]?.release()
-            self.convivaAnalyticsInstances.removeValue(forKey: nativeId)
-        }
-        .runOnQueue(.main)
+        AsyncFunction("destroy") { (owner: SharedConviva) in owner.release() }
+            .runOnQueue(.main)
 
-        AsyncFunction("release") { (nativeId: NativeId) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
-            conviva.release()
-        }
-        .runOnQueue(.main)
+        AsyncFunction("release") { (owner: SharedConviva) in owner.release() }
+            .runOnQueue(.main)
 
-        AsyncFunction("initializeSession") { (nativeId: NativeId) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("initializeSession") { (owner: SharedConviva) in
+            let conviva = try owner.requireAnalytics()
             do {
                 try conviva.initializeSession()
             } catch {
                 throw Exception(
                     name: "SessionInitializationFailed",
                     description: """
-                    Could not initialize session for Conviva Analytics with \
-                    native Id \(nativeId): \(error.localizedDescription)
+                    Could not initialize session for Conviva Analytics: \(error.localizedDescription)
                     """
                 )
             }
         }
         .runOnQueue(.main)
 
-        AsyncFunction("endSession") { (nativeId: NativeId) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("endSession") { (owner: SharedConviva) in
+            let conviva = try owner.requireAnalytics()
             conviva.endSession()
         }
         .runOnQueue(.main)
 
-        AsyncFunction("updateContentMetadata") { (nativeId: NativeId, metadata: [String: Any]) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("updateContentMetadata") { (owner: SharedConviva, metadata: [String: Any]) in
+            let conviva = try owner.requireAnalytics()
             guard let metadataOverride = RCTConvert.metadataOverrides(metadata) else {
                 throw Exception(
                     name: "InvalidMetadata",
@@ -143,37 +88,22 @@ public class BitmovinPlayerReactNativeAnalyticsConvivaModule: Module { // swiftl
         }
         .runOnQueue(.main)
 
-        AsyncFunction("sendCustomApplicationEvent") { (nativeId: NativeId, name: String, attributes: [String: Any]) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("sendCustomApplicationEvent") { (owner: SharedConviva, name: String, attributes: [String: Any]) in
+            let conviva = try owner.requireAnalytics()
             let attributesStringDict = attributes.compactMapValues { $0 as? String }
             conviva.sendCustomApplicationEvent(name: name, attributes: attributesStringDict)
         }
         .runOnQueue(.main)
 
-        AsyncFunction("sendCustomPlaybackEvent") { (nativeId: NativeId, name: String, attributes: [String: Any]) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("sendCustomPlaybackEvent") { (owner: SharedConviva, name: String, attributes: [String: Any]) in
+            let conviva = try owner.requireAnalytics()
             let attributesStringDict = attributes.compactMapValues { $0 as? String }
             conviva.sendCustomPlaybackEvent(name: name, attributes: attributesStringDict)
         }
         .runOnQueue(.main)
 
-        AsyncFunction("reportPlaybackDeficiency") { (nativeId: NativeId, message: String, severity: String, endSession: Bool) in // swiftlint:disable:this line_length
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("reportPlaybackDeficiency") { (owner: SharedConviva, message: String, severity: String, endSession: Bool) in // swiftlint:disable:this line_length
+            let conviva = try owner.requireAnalytics()
             guard let severityValue = RCTConvert.severity(severity) else {
                 throw Exception(
                     name: "InvalidSeverity",
@@ -190,36 +120,21 @@ public class BitmovinPlayerReactNativeAnalyticsConvivaModule: Module { // swiftl
         }
         .runOnQueue(.main)
 
-        AsyncFunction("pauseTracking") { (nativeId: NativeId, isBumper: Bool) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("pauseTracking") { (owner: SharedConviva, isBumper: Bool) in
+            let conviva = try owner.requireAnalytics()
             conviva.pauseTracking(isBumper: isBumper)
         }
         .runOnQueue(.main)
 
-        AsyncFunction("resumeTracking") { (nativeId: NativeId) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("resumeTracking") { (owner: SharedConviva) in
+            let conviva = try owner.requireAnalytics()
             conviva.resumeTracking()
         }
         .runOnQueue(.main)
 
         // iOS only functions
-        AsyncFunction("setPlayerViewRef") { (nativeId: NativeId, playerViewRefId: Int) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("setPlayerViewRef") { (owner: SharedConviva, playerViewRefId: Int) in
+            let conviva = try owner.requireAnalytics()
 
             // Get the view from the view registry using the ref ID
             guard let appContext = self.appContext,
@@ -235,31 +150,22 @@ public class BitmovinPlayerReactNativeAnalyticsConvivaModule: Module { // swiftl
         }
         .runOnQueue(.main)
 
-        AsyncFunction("resetPlayerViewRef") { (nativeId: NativeId) in
-            guard let conviva = self.retrieve(nativeId) else {
-                throw Exception(
-                    name: "ConvivaNotFound",
-                    description: "Could not retrieve Conviva Analytics instance with native Id \(nativeId)"
-                )
-            }
+        AsyncFunction("resetPlayerViewRef") { (owner: SharedConviva) in
+            let conviva = try owner.requireAnalytics()
             conviva.playerView = nil
         }
         .runOnQueue(.main)
 
         // Android only functions (no-op on iOS)
-        AsyncFunction("reportAppForegrounded") { (_: NativeId) in
+        AsyncFunction("reportAppForegrounded") { (_: SharedConviva) in
             // No-op on iOS
         }
         .runOnQueue(.main)
 
-        AsyncFunction("reportAppBackgrounded") { (_: NativeId) in
+        AsyncFunction("reportAppBackgrounded") { (_: SharedConviva) in
             // No-op on iOS
         }
         .runOnQueue(.main)
-    }
-
-    internal func retrieve(_ nativeId: NativeId) -> ConvivaAnalytics? {
-        convivaAnalyticsInstances[nativeId]
     }
 }
 

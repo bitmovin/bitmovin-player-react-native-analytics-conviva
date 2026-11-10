@@ -1,16 +1,23 @@
-import { requireNativeModule } from 'expo-modules-core';
+import type { NativeConviva } from './BitmovinPlayerReactNativeAnalyticsConvivaModule';
+import { type NativeModule, requireNativeModule } from 'expo-modules-core';
 
-interface BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule {
-  isAdBreakActive(nativeId: string): Promise<boolean>;
+declare class BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule extends NativeModule {
+  isAdBreakActive(owner: NativeConviva): Promise<boolean>;
   reportAdBreakStarted(
-    nativeId: string,
+    owner: NativeConviva,
     adBreakInfo?: Record<string, any>
   ): Promise<void>;
-  reportAdBreakFinished(nativeId: string): Promise<void>;
-  reportAdStarted(nativeId: string, adInfo: Record<string, any>): Promise<void>;
-  reportAdFinished(nativeId: string): Promise<void>;
-  reportAdSkipped(nativeId: string): Promise<void>;
-  updateAdInfo(nativeId: string, adInfo: Record<string, any>): Promise<void>;
+  reportAdBreakFinished(owner: NativeConviva): Promise<void>;
+  reportAdStarted(
+    owner: NativeConviva,
+    adInfo: Record<string, any>
+  ): Promise<void>;
+  reportAdFinished(owner: NativeConviva): Promise<void>;
+  reportAdSkipped(owner: NativeConviva): Promise<void>;
+  updateAdInfo(
+    owner: NativeConviva,
+    adInfo: Record<string, any>
+  ): Promise<void>;
 }
 
 export default requireNativeModule<BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule>(

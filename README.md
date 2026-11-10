@@ -2,6 +2,12 @@
 
 This is an open-source project to enable the use of a third-party component (Conviva) with the Bitmovin Player React Native SDK.
 
+> **Compatibility:** This version targets the upcoming React Native Player release
+> containing [SharedObjects support (#1167)](https://github.com/bitmovin/bitmovin-player-react-native/pull/1167).
+> It is incompatible with currently released Player versions (`1.30.0` and earlier).
+> Until that release is available, use the pinned development revision. The exact
+> minimum supported release version must be set before publishing this integration.
+
 ## Maintenance and Update
 
 This project is not part of a regular maintenance or update schedule and is updated once yearly to conform with the latest product versions. For additional update requests, please take a look at the guidance further below.
@@ -42,57 +48,31 @@ or with yarn:
 yarn add bitmovin-player-react-native-analytics-conviva
 ```
 
-Additionally to install the native dependencies, follow the next steps:
+This branch requires the SharedObject-based Player bindings, Expo SDK 57+, and iOS/tvOS 16.4+.
+The development dependencies and example pin the compatible unreleased Player revision.
+The peer range excludes current releases; the future release must also contain #1167.
 
 ### iOS
 
-#### Option 1: Expo Config Plugin (Recommended)
+The native Conviva integration is linked through Swift Package Manager, using the
+same Player package as the React Native bindings. Remove any manually configured
+`BitmovinConvivaAnalytics`, `BitmovinPlayer`, and `ConvivaSDK` pods before upgrading.
 
-If you're using Expo, you can use the built-in config plugin for automatic iOS dependency configuration:
+Add the config plugin after the Player plugin:
 
 ```javascript
-// app.config.js or app.config.ts
 export default {
   plugins: [
-    [
-      'bitmovin-player-react-native-analytics-conviva',
-      {
-        convivaAnalyticsVersion: '3.6.2', // Optional, defaults to 3.6.2
-      },
-    ],
+    'bitmovin-player-react-native',
+    'bitmovin-player-react-native-analytics-conviva',
   ],
 };
 ```
 
-The plugin will automatically:
-
-- Add the BitmovinConvivaAnalytics pod with Git source and tag
-- Ensure version compatibility (minimum 3.6.2)
-- Handle Podfile modifications during `expo prebuild`
-
-#### Option 2: Manual Installation
-
-If you're not using Expo or prefer manual configuration:
-
-Simply add the following lines to the top of your Podfile:
-
-```ruby
-source 'https://cdn.cocoapods.org'
-source 'https://github.com/bitmovin/cocoapod-specs.git'
-```
-
-Then add the following line to your desired target:
-
-```ruby
-pod 'BitmovinConvivaAnalytics', git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git', tag: '3.6.2'
-```
-
-Then, in your command line run in your `ios` folder:
-
-```sh
-pod repo update
-pod install
-```
+The native package defaults to the compatible revision in `ios/dependencies.json`.
+This includes the deployment target fix needed by current Player packages. Run `yarn expo prebuild`
+and install pods to regenerate the native integration. The React Native module
+itself remains a local pod; its native SDK dependency comes from SPM.
 
 ### Android
 
@@ -119,7 +99,7 @@ For more information about permissions and collected network types please look a
 
 ### Compatibility
 
-Conviva Analytics Integration depends on `bitmovin-player-react-native` version `>= 0.25.0`.
+This version requires the upcoming React Native Player release containing #1167 and Expo SDK 57+. Player `1.30.0` and earlier are incompatible. The pinned development dependency identifies the compatible unreleased revision.
 
 ## Usage
 
@@ -284,65 +264,48 @@ const player = usePlayer();
 convivaAnalytics.attachPlayer(player);
 ```
 
-## Migration from Manual iOS Configuration
+<a id="migration-from-manual-ios-configuration"></a>
 
-If you were previously configuring the BitmovinConvivaAnalytics pod manually using `expo-build-properties` or in the `Podfile` directly, you can migrate to the config plugin for easier maintenance:
+## Migration to SharedObjects
 
-### Before (Manual Configuration)
+Keep and reuse the `Player` and `ConvivaAnalytics` instances. Player attachment and
+all Conviva and SSAI methods now pass native SharedObjects directly. `nativeId`
+remains a deprecated JS compatibility alias; it is never resolved in native code.
 
-```javascript
-// app.config.js
-export default {
-  plugins: [
-    [
-      'expo-build-properties',
-      {
-        ios: {
-          extraPods: [
-            {
-              name: 'BitmovinConvivaAnalytics',
-              git: 'https://github.com/bitmovin/bitmovin-player-ios-analytics-conviva.git',
-              tag: '3.6.2',
-            },
-          ],
-        },
-      },
-    ],
-  ],
-};
+Construction starts one native creation attempt. `initialize()` and all commands
+await that same attempt. Concurrent initialization does not create duplicate
+integrations. If creation fails, construct a new instance to retry.
+
+Commands return promises so native failures can be handled by the caller:
+
+```ts
+await convivaAnalytics.initialize();
+await convivaAnalytics.attachPlayer(player);
+await convivaAnalytics.updateContentMetadata({ assetName: 'Art of Motion' });
+await convivaAnalytics.ssai.reportAdBreakStarted();
+await convivaAnalytics.ssai.reportAdStarted({ id: 'ad' });
+await convivaAnalytics.ssai.reportAdFinished();
+await convivaAnalytics.ssai.reportAdBreakFinished();
+await convivaAnalytics.release();
 ```
 
-### After (Automatic Configuration)
+`release()` and `destroy()` both end this integration's lifetime and wait for
+pending initialization. Repeated release is safe. Create a new instance to start
+tracking again. Unreachable integrations also release their native SDK resources
+on the main thread. An attached integration keeps its Player SharedObject and JS
+callbacks alive until release; it does not prevent an explicit `player.destroy()`.
 
-#### Use default version
-
-```javascript
-// app.config.js
-export default {
-  plugins: ['bitmovin-player-react-native-analytics-conviva'],
-};
-```
-
-### Use specific version
-
-```javascript
-// app.config.js
-export default {
-  plugins: [
-    [
-      'bitmovin-player-react-native-analytics-conviva',
-      {
-        convivaAnalyticsVersion: '3.6.2', // Optional
-      },
-    ],
-  ],
-};
-```
+The `ssai` helper belongs to its `ConvivaAnalytics` instance. Use that property
+instead of constructing helpers by ID. iOS/tvOS view events still use
+`setPlayerViewRef()` and the `PlayerView` reference.
 
 ## Configuration Options
 
-The Expo config plugin supports the following options:
+| Option                       | Type   | Default                             | Description                                                  |
+| ---------------------------- | ------ | ----------------------------------- | ------------------------------------------------------------ |
+| `bitmovinConvivaIosVersion`  | string | Unset                               | Override the pinned Swift package with a compatible release. |
+| `bitmovinConvivaIosRevision` | string | Revision in `ios/dependencies.json` | Override the Swift package revision.                         |
 
-| Option                    | Type   | Default | Description                                                   |
-| ------------------------- | ------ | ------- | ------------------------------------------------------------- |
-| `convivaAnalyticsVersion` | string | "3.6.2" | Version of BitmovinConvivaAnalytics iOS pod. Must be >= 3.6.2 |
+Choose either a version or a revision. A release must support the deployment targets
+of the selected Player package. Version 3.7.0 declares iOS/tvOS 14 and cannot be used
+with the Player package selected by this branch; the pinned revision raises it to 15.

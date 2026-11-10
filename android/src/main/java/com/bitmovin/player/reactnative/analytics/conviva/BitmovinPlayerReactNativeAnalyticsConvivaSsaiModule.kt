@@ -1,6 +1,5 @@
 package com.bitmovin.player.reactnative.analytics.conviva
 
-import com.bitmovin.analytics.conviva.ConvivaAnalyticsIntegration
 import com.bitmovin.player.reactnative.analytics.conviva.converter.toSsaiAdInfo
 import expo.modules.kotlin.functions.Queues
 import expo.modules.kotlin.exception.CodedException
@@ -11,87 +10,75 @@ class BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule : Module() {
     override fun definition() = ModuleDefinition {
         Name(NAME)
 
-        AsyncFunction("isAdBreakActive") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("isAdBreakActive") { owner: SharedConviva ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             val ssaiApi = convivaAnalytics.ssai
-                ?: throw SsaiNotAvailableException(nativeId)
+                ?: throw SsaiNotAvailableException()
             
             return@AsyncFunction ssaiApi.isAdBreakActive
         }
             .runOnQueue(Queues.MAIN)
 
-        AsyncFunction("reportAdBreakStarted") { nativeId: String, adBreakInfo: Map<String, Any?>? ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("reportAdBreakStarted") { owner: SharedConviva, adBreakInfo: Map<String, Any?>? ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             val ssaiApi = convivaAnalytics.ssai
-                ?: throw SsaiNotAvailableException(nativeId)
+                ?: throw SsaiNotAvailableException()
             
             ssaiApi.reportAdBreakStarted(adBreakInfo)
         }
             .runOnQueue(Queues.MAIN)
 
-        AsyncFunction("reportAdBreakFinished") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("reportAdBreakFinished") { owner: SharedConviva ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             val ssaiApi = convivaAnalytics.ssai
-                ?: throw SsaiNotAvailableException(nativeId)
+                ?: throw SsaiNotAvailableException()
             
             ssaiApi.reportAdBreakFinished()
         }
             .runOnQueue(Queues.MAIN)
 
-        AsyncFunction("reportAdStarted") { nativeId: String, adInfo: Map<String, Any?> ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("reportAdStarted") { owner: SharedConviva, adInfo: Map<String, Any?> ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             val ssaiApi = convivaAnalytics.ssai
-                ?: throw SsaiNotAvailableException(nativeId)
+                ?: throw SsaiNotAvailableException()
             
             ssaiApi.reportAdStarted(adInfo.toSsaiAdInfo())
         }
             .runOnQueue(Queues.MAIN)
 
-        AsyncFunction("reportAdFinished") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("reportAdFinished") { owner: SharedConviva ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             val ssaiApi = convivaAnalytics.ssai
-                ?: throw SsaiNotAvailableException(nativeId)
+                ?: throw SsaiNotAvailableException()
             
             ssaiApi.reportAdFinished()
         }
             .runOnQueue(Queues.MAIN)
 
-        AsyncFunction("reportAdSkipped") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("reportAdSkipped") { owner: SharedConviva ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             val ssaiApi = convivaAnalytics.ssai
-                ?: throw SsaiNotAvailableException(nativeId)
+                ?: throw SsaiNotAvailableException()
             
             ssaiApi.reportAdSkipped()
         }
             .runOnQueue(Queues.MAIN)
 
-        AsyncFunction("updateAdInfo") { nativeId: String, adInfo: Map<String, Any?> ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("updateAdInfo") { owner: SharedConviva, adInfo: Map<String, Any?> ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             val ssaiApi = convivaAnalytics.ssai
-                ?: throw SsaiNotAvailableException(nativeId)
+                ?: throw SsaiNotAvailableException()
             
             ssaiApi.updateAdInfo(adInfo.toSsaiAdInfo())
         }
             .runOnQueue(Queues.MAIN)
-    }
-
-    private fun getConvivaAnalyticsOrNull(nativeId: String): ConvivaAnalyticsIntegration? {
-        return appContext.registry.getModule<BitmovinPlayerReactNativeAnalyticsConvivaModule>()
-            ?.getConvivaAnalyticsOrNull(nativeId)
     }
 
     companion object {
@@ -99,6 +86,5 @@ class BitmovinPlayerReactNativeAnalyticsConvivaSsaiModule : Module() {
     }
 }
 
-// Exception classes
-internal class SsaiNotAvailableException(nativeId: String) :
-    CodedException("SSAI API not available for Conviva Analytics instance with native Id $nativeId")
+internal class SsaiNotAvailableException :
+    CodedException("SSAI API not available for this Conviva Analytics instance")

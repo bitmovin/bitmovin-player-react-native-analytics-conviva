@@ -2,7 +2,7 @@ package com.bitmovin.player.reactnative.analytics.conviva
 
 import com.bitmovin.analytics.conviva.ConvivaAnalyticsIntegration
 import com.bitmovin.analytics.conviva.ConvivaConfig
-import com.bitmovin.player.reactnative.PlayerRegistry
+import com.bitmovin.player.reactnative.SharedPlayer
 import com.bitmovin.player.reactnative.analytics.conviva.converter.toErrorSeverity
 import com.bitmovin.player.reactnative.analytics.conviva.converter.toMetadataOverrides
 import expo.modules.kotlin.exception.CodedException
@@ -12,99 +12,74 @@ import expo.modules.kotlin.modules.ModuleDefinition
 
 class BitmovinPlayerReactNativeAnalyticsConvivaModule : Module() {
 
-    private val convivaAnalyticsInstances: Registry<ConvivaAnalyticsIntegration> = mutableMapOf()
-
     override fun definition() = ModuleDefinition {
         Name(NAME)
 
-        AsyncFunction("initWithConfig") { nativeId: String, playerNativeId: String?, customerKey: String, gatewayUrl: String?, debugLoggingEnabled: Boolean ->
-            val player = playerNativeId?.let { id ->
-                PlayerRegistry.getPlayer(id) ?: throw PlayerNotFoundException(id)
-            }
+        Class(SharedConviva::class) {
+            Constructor { error("Use ConvivaAnalytics to create an integration") }
+        }
 
+        AsyncFunction("create") { player: SharedPlayer?, customerKey: String, gatewayUrl: String?, debugLoggingEnabled: Boolean ->
             val config = ConvivaConfig()
             config.gatewayUrl = gatewayUrl
             config.isDebugLoggingEnabled = debugLoggingEnabled
             try {
                 val convivaAnalytics = ConvivaAnalyticsIntegration(
-                    player,
+                    player?.player,
                     customerKey,
                     appContext.reactContext,
                     config,
                 )
-                convivaAnalyticsInstances[nativeId] = convivaAnalytics
+                SharedConviva(appContext, convivaAnalytics, player)
             } catch (e: Exception) {
-                throw InitializationFailedException(nativeId, playerNativeId, customerKey, e)
+                throw InitializationFailedException(e)
             }
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("attachPlayer") { nativeId: String, playerNativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
-            
-            val player = PlayerRegistry.getPlayer(playerNativeId)
-                ?: throw PlayerNotFoundException(playerNativeId)
-
-            convivaAnalytics.attachPlayer(player)
+        AsyncFunction("attachPlayer") { owner: SharedConviva, player: SharedPlayer ->
+            owner.attach(player)
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("destroy") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
-            
-            convivaAnalytics.release()
-            convivaAnalyticsInstances.remove(nativeId)
-        }.runOnQueue(Queues.MAIN)
+        AsyncFunction("destroy") { owner: SharedConviva -> owner.release() }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("release") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
-            
-            convivaAnalytics.release()
-        }.runOnQueue(Queues.MAIN)
+        AsyncFunction("release") { owner: SharedConviva -> owner.release() }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("initializeSession") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("initializeSession") { owner: SharedConviva ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             try {
                 convivaAnalytics.initializeSession()
             } catch (e: Exception) {
-                throw SessionInitializationFailedException(nativeId, e)
+                throw SessionInitializationFailedException(e)
             }
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("endSession") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("endSession") { owner: SharedConviva ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             convivaAnalytics.endSession()
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("updateContentMetadata") { nativeId: String, contentMetadata: Map<String, Any?> ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("updateContentMetadata") { owner: SharedConviva, contentMetadata: Map<String, Any?> ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             convivaAnalytics.updateContentMetadata(contentMetadata.toMetadataOverrides())
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("sendCustomApplicationEvent") { nativeId: String, name: String, attributes: Map<String, Any?> ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("sendCustomApplicationEvent") { owner: SharedConviva, name: String, attributes: Map<String, Any?> ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             convivaAnalytics.sendCustomApplicationEvent(name, attributes)
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("sendCustomPlaybackEvent") { nativeId: String, name: String, attributes: Map<String, Any?> ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("sendCustomPlaybackEvent") { owner: SharedConviva, name: String, attributes: Map<String, Any?> ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             convivaAnalytics.sendCustomPlaybackEvent(name, attributes)
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("reportPlaybackDeficiency") { nativeId: String, message: String, severity: String, endSession: Boolean ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("reportPlaybackDeficiency") { owner: SharedConviva, message: String, severity: String, endSession: Boolean ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             val errorSeverity = severity.toErrorSeverity()
                 ?: throw InvalidSeverityException(severity)
@@ -112,46 +87,38 @@ class BitmovinPlayerReactNativeAnalyticsConvivaModule : Module() {
             convivaAnalytics.reportPlaybackDeficiency(message, errorSeverity, endSession)
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("pauseTracking") { nativeId: String, isBumper: Boolean ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("pauseTracking") { owner: SharedConviva, isBumper: Boolean ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             convivaAnalytics.pauseTracking(isBumper)
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("resumeTracking") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("resumeTracking") { owner: SharedConviva ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             convivaAnalytics.resumeTracking()
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("reportAppForegrounded") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("reportAppForegrounded") { owner: SharedConviva ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             convivaAnalytics.reportAppForegrounded()
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("reportAppBackgrounded") { nativeId: String ->
-            val convivaAnalytics = getConvivaAnalyticsOrNull(nativeId)
-                ?: throw ConvivaNotFoundException(nativeId)
+        AsyncFunction("reportAppBackgrounded") { owner: SharedConviva ->
+            val convivaAnalytics = owner.requireAnalytics()
             
             convivaAnalytics.reportAppBackgrounded()
         }.runOnQueue(Queues.MAIN)
 
         // iOS only functions (no-op on Android)
-        AsyncFunction("setPlayerViewRef") { _: String, _: Int ->
+        AsyncFunction("setPlayerViewRef") { _: SharedConviva, _: Int ->
             // No-op on Android
         }.runOnQueue(Queues.MAIN)
 
-        AsyncFunction("resetPlayerViewRef") { _: String ->
+        AsyncFunction("resetPlayerViewRef") { _: SharedConviva ->
             // No-op on Android
         }.runOnQueue(Queues.MAIN)
-    }
-
-    internal fun getConvivaAnalyticsOrNull(nativeId: String): ConvivaAnalyticsIntegration? {
-        return convivaAnalyticsInstances[nativeId]
     }
 
     companion object {
@@ -159,25 +126,11 @@ class BitmovinPlayerReactNativeAnalyticsConvivaModule : Module() {
     }
 }
 
-// Exception classes
-internal class PlayerNotFoundException(playerId: String) :
-    CodedException("Could not retrieve Player with native Id $playerId")
+internal class InitializationFailedException(cause: Throwable) :
+    CodedException("Could not initialize Conviva Analytics: ${cause.message}", cause)
 
-internal class ConvivaNotFoundException(nativeId: String) :
-    CodedException("Could not retrieve Conviva Analytics instance with native Id $nativeId")
-
-internal class InitializationFailedException(
-    nativeId: String,
-    playerNativeId: String?,
-    customerKey: String,
-    cause: Throwable
-) : CodedException(
-    "Could not initialize Conviva Analytics with native Id $nativeId " +
-    "using playerNativeId ${playerNativeId ?: "null"} and customerKey $customerKey: ${cause.message}"
-)
-
-internal class SessionInitializationFailedException(nativeId: String, cause: Throwable) :
-    CodedException("Could not initialize session for Conviva Analytics with native Id $nativeId: ${cause.message}")
+internal class SessionInitializationFailedException(cause: Throwable) :
+    CodedException("Could not initialize session for Conviva Analytics: ${cause.message}", cause)
 
 internal class InvalidSeverityException(severity: String) :
     CodedException("Invalid severity value \"$severity\"")
